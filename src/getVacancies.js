@@ -2,43 +2,57 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 const BASE_URL = 'https://remote-job.ru';
-const START_PAGE = '/';
 
 async function fetchHtml(path) {
   try {
     const response = await axios.get(`${BASE_URL}${path}`, {
       timeout: 10000,
       headers: {
-        'User-Agent': 'Mozilla/5.0'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Accept-Language': 'ru-RU,ru;q=0.9,en;q=0.8'
       }
     });
 
     return response.data;
   } catch (error) {
-    console.error('Ошибка загрузки:', path);
     return null;
   }
 }
 
-async function getVacancies() {
-  const html = await fetchHtml(START_PAGE);
-
-  if (!html) {
-    return null
-  }
+async function getLastPage(path = '/') {
+  const html = await fetchHtml(path);
+  if (!html) return null;
 
   const $ = cheerio.load(html);
 
+  const lastPage = Math.max(
+    ...$('.pagination a')
+      .map((_, el) => Number($(el).text()))
+      .get()
+      .filter(Boolean)
+  );
+
+  return lastPage;
+}
+
+async function getVacancies(path = '/') {
+  const html = await fetchHtml(path);
+  if (!html) return null;
+
+  const $ = cheerio.load(html);
   const vacancies = [];
 
-  $('.vacancy-colored').each((_, element) => {
-    const title = $(element).find('a').first().text().trim();
-    const company = $(element).find('small').first().text().trim();
-    const link = $(element).find('a').first().attr('href');
+  $('.vacancy_item').each((_, element) => {
+    const anchor = $(element).find('a').first();
+    const title = anchor.text().trim();
+    const link = anchor.attr('href');
 
     if (!title || !link) {
+        console.log(`link: ${link} title: ${title}`);
         return;
     }
+
+    const company = $(element).find('small').next().text().trim();
 
     vacancies.push({
       title,
@@ -50,4 +64,4 @@ async function getVacancies() {
   return vacancies;
 }
 
-module.exports = { getVacancies };
+module.exports = { getVacancies, getLastPage };

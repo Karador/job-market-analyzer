@@ -1,15 +1,45 @@
-const { getVacancies } = require('./getVacancies');
+const { getVacancies, getLastPage } = require('./getVacancies');
 
-(async () => {
-  const vacancies = await getVacancies();
+async function loadVacanciesPage(path) {
+  const vacancies = await getVacancies(path);
 
   if (!vacancies) {
 
-    console.log('failed to load data');
+    console.log('Страница не загрузилась');
+    return [];
 
-  } else {
-
-    console.log(vacancies.slice(0, 5));
-    
   }
+
+  console.log(`Найдено вакансий: ${vacancies.length}`);
+  return vacancies;
+
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function buildPath(page) {
+  return `/page/udalennaya-rabota-programmistom-vakansii?search[exactMatch]=0&search[query]=%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%81%D1%82&search[searchType]=vacancy&page=${page}`
+}
+
+(async () => {
+  const vacancies = [];
+  const startingPage = buildPath(1);
+
+  const lastPage = await getLastPage(startingPage);
+  console.log(lastPage);
+
+  if (!lastPage) {
+    console.log("Ошибка загрузки");
+    return
+  }
+
+  for (let page = 1; page <= lastPage; page++) {
+    const data = await loadVacanciesPage(buildPath(page));
+    vacancies.push(...data);
+    await sleep(1000); // 1 секунда
+  }
+
+  console.log(vacancies.slice(0, 5));
 })();
