@@ -1,4 +1,5 @@
 const { getVacancies, getLastPage } = require('./getVacancies');
+const { classifyVacancies } = require('./classifyVacancies');
 
 async function loadVacanciesPage(path) {
   const vacancies = await getVacancies(path);
@@ -35,11 +36,13 @@ function buildPath(page) {
     return
   }
 
-  for (let page = 1; page <= lastPage; page++) {
+  for (let page = 1; page <= 5; page++) {
     const data = await loadVacanciesPage(buildPath(page));
     vacancies.push(...data);
-    await sleep(1000); // 1 секунда
+    await sleep(1000);
   }
 
-  console.log(vacancies.slice(0, 5));
+  for (const [group, filteredVacancies] of Object.entries(classifyVacancies(vacancies))) {
+    console.log(`${group}: ${filteredVacancies.length}`)
+  }
 })();
