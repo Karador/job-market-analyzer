@@ -36,13 +36,17 @@ function buildPath(page) {
     return
   }
 
-  for (let page = 1; page <= 5; page++) {
+  for (let page = 1; page <= lastPage; page++) {
     const data = await loadVacanciesPage(buildPath(page));
     vacancies.push(...data);
     await sleep(1000);
   }
 
-  for (const [group, filteredVacancies] of Object.entries(classifyVacancies(vacancies))) {
-    console.log(`${group}: ${filteredVacancies.length}`)
+  const { filteredVacancies, intersections } = classifyVacancies(vacancies);
+
+  console.log(intersections);
+
+  for (const [group, vacanciesClassifyed] of Object.entries(filteredVacancies)) {
+    console.log(`${group}: ${vacanciesClassifyed.length}`)
   }
 })();

@@ -8,9 +8,9 @@ const taskTypes = {
     ],
     automation: [
         'automation',
-        'script', 'скрипт',
+        // 'script', 'скрипт',
         'parser', 'парсер',
-        'bot', 'бот',
+        // 'bot', 'бот',
         'integration', 'интеграция',
         'internal tool',
         'low-code', 'nocode'
@@ -62,18 +62,33 @@ const taskTypes = {
 
 function classifyVacancies(vacancies = []) {
     const filteredVacancies = {};
+    const intersections = [];
 
     vacancies.forEach((vacancy) => {
+        const matchedGroups = [];
         const title = vacancy.title.toLowerCase();
 
         for (const [group, words] of Object.entries(taskTypes)) {
             if (words.some(word => title.includes(word))) {
-                !filteredVacancies[group] ? filteredVacancies[group] = [{ ...vacancy }] : filteredVacancies[group].push(vacancy);
+                matchedGroups.push(group);
+
+                if (!filteredVacancies[group]) {
+                    filteredVacancies[group] = [];
+                }
+
+                filteredVacancies[group].push(vacancy);
             }
+        }
+
+        if (matchedGroups.length > 1) {
+            intersections.push({ title, matchedGroups });
         }
     });
 
-    return filteredVacancies;
+    return {
+        filteredVacancies,
+        intersections,
+    };
 }
 
 module.exports = { classifyVacancies };
