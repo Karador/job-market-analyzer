@@ -81,7 +81,7 @@ function classifyVacancies(vacancies = []) {
         }
 
         if (matchedGroups.length > 1) {
-            intersections.push({ title, matchedGroups });
+            intersections.push({ vacancy, matchedGroups });
         }
     });
 
