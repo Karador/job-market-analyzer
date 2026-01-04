@@ -36,7 +36,7 @@ function buildPath(page) {
     return
   }
 
-  for (let page = 1; page <= 1; page++) {
+  for (let page = 1; page <= lastPage; page++) {
     const data = await loadVacanciesPage(buildPath(page));
     vacancies.push(...data);
     await sleep(1000);
@@ -46,13 +46,18 @@ function buildPath(page) {
 
   scored
     .sort((a, b) => b.scores.total - a.scores.total)
-    .slice(0, 20)
+    .slice(0, 10)
     .forEach(v => {
-      console.log(
+      const values = [
         v.vacancy.link,
-        v.scores.total,
-        v.scores.entry.matched,
-        v.scores.quality.redFlags
-      );
+        v.explain.total,
+        v.explain.verdict,
+        v.explain.notes,
+        v.explain.contributions.groups,
+        v.explain.contributions.entry,
+        v.explain.contributions.quality,
+      ];
+
+      values.forEach(item => console.log(item));
     });
 })();
