@@ -53,10 +53,12 @@ async function getVacancies(path = '/') {
     }
 
     const company = $(element).find('small').next().text().trim();
+    const description = $(element).find('div').next().text().trim();
 
     vacancies.push({
       title,
       company,
+      description,
       link: BASE_URL + link,
     });
   });

@@ -1,5 +1,5 @@
 const { getVacancies, getLastPage } = require('./getVacancies');
-const { classifyVacancies } = require('./classifyVacancies');
+const { scoreVacancies } = require('./scoreVacancies');
 
 async function loadVacanciesPage(path) {
   const vacancies = await getVacancies(path);
@@ -21,7 +21,7 @@ function sleep(ms) {
 }
 
 function buildPath(page) {
-  return `/page/udalennaya-rabota-programmistom-vakansii?search[exactMatch]=0&search[query]=%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%81%D1%82&search[searchType]=vacancy&page=${page}`
+  return `/search?search%5BexactMatch%5D=0&search%5Bquery%5D=%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%81%D1%82&search%5BsearchType%5D=vacancy&alias=udalennaya-rabota-programmistom-vakansii&page=${page}&period=4`
 }
 
 (async () => {
@@ -36,17 +36,23 @@ function buildPath(page) {
     return
   }
 
-  for (let page = 1; page <= lastPage; page++) {
+  for (let page = 1; page <= 1; page++) {
     const data = await loadVacanciesPage(buildPath(page));
     vacancies.push(...data);
     await sleep(1000);
   }
 
-  const { filteredVacancies, intersections } = classifyVacancies(vacancies);
+  const scored = scoreVacancies(vacancies);
 
-  console.log(intersections);
-
-  for (const [group, vacanciesClassifyed] of Object.entries(filteredVacancies)) {
-    console.log(`${group}: ${vacanciesClassifyed.length}`)
-  }
+  scored
+    .sort((a, b) => b.scores.total - a.scores.total)
+    .slice(0, 20)
+    .forEach(v => {
+      console.log(
+        v.vacancy.link,
+        v.scores.total,
+        v.scores.entry.matched,
+        v.scores.quality.redFlags
+      );
+    });
 })();
