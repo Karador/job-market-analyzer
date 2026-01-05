@@ -37,8 +37,8 @@ async function getVacancies(path = '/') {
         return;
     }
 
-    const company = $(element).find('small').next().text().trim();
-    const description = $(element).find('div').text() + $(element).find('div').next().text();
+    const company = $(element).find('small').next().text();
+    const description = $(element).find('div').first().text();
 
     vacancies.push({
       title,

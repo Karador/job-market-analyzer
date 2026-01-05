@@ -1,6 +1,5 @@
 const { taskTypes, entrySignals, softPenalties, qualitySignals } = require('./dictionaries');
 const { explainVacancy } = require('./explain');
-const { normalizeVacancy } = require('../model/normalizeVacancy')
 
 function scoreSoftPenalties(text) {
   let penalty = 0;
@@ -95,9 +94,7 @@ function scoreGroups(text) {
 }
 
 function scoreVacancy(vacancy) {
-  const text = normalizeVacancy(
-    `${vacancy.title} ${vacancy.description || ''}`
-  );
+  const text = vacancy.text;
 
   const groups = scoreGroups(text);
   const entry = scoreEntry(text);
@@ -136,8 +133,4 @@ function scoreVacancy(vacancy) {
   };
 }
 
-function scoreVacancies(vacancies = []) {
-  return vacancies.map(vacancy => scoreVacancy(vacancy));
-}
-
-module.exports = { scoreVacancies };
+module.exports = { scoreVacancy };

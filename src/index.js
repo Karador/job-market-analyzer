@@ -1,5 +1,6 @@
 const remoteJob = require('./fetch/remoteJob.fetch');
-const { scoreVacancies } = require('./score/scoreVacancies');
+const { normalizeVacancy } = require('./model/normalizeVacancy');
+const { scoreVacancy } = require('./score/scoreVacancies');
 
 async function loadVacanciesPage(path) {
   const vacancies = await remoteJob.getVacancies(path);
@@ -91,7 +92,7 @@ function penaltyStats(scored) {
 }
 
 (async () => {
-  const vacancies = [];
+  const rawVacancies = [];
   const startingPage = buildPath(1);
 
   const lastPage = await remoteJob.getLastPage(startingPage);
@@ -104,11 +105,11 @@ function penaltyStats(scored) {
 
   for (let page = 1; page <= lastPage; page++) {
     const data = await loadVacanciesPage(buildPath(page));
-    vacancies.push(...data);
+    rawVacancies.push(...data);
     await sleep(1000);
   }
 
-  const scored = scoreVacancies(vacancies);
+  const scored = rawVacancies.map(normalizeVacancy).map(scoreVacancy);
 
   console.log(scoreStats(scored));
 
