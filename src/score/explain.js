@@ -29,35 +29,38 @@ function explainVacancy(scored) {
   }
 
   return {
-    baseTotal: scores.baseTotal,
-    total: scores.total,
-    verdict: verdictFromScore(scores.total),
-    softPenalty: scores.softPenalty,
+    ...scored,
+    explain: {
+      baseTotal: scores.baseTotal,
+      total: scores.total,
+      verdict: verdictFromScore(scores.total),
+      softPenalty: scores.softPenalty,
 
-    contributions: {
-      groups: {
-        chosen: bestGroup,
-        score: bestGroupScore,
-        matched: scores.groups.matches[bestGroup]
+      contributions: {
+        groups: {
+          chosen: bestGroup,
+          score: bestGroupScore,
+          matched: scores.groups.matches[bestGroup]
+        },
+
+        entry: {
+          score: scores.entry.normalized,
+          positive: scores.entry.matched.filter(p =>
+            Object.keys(entrySignals.positive).includes(p)
+          ),
+          negative: scores.entry.matched.filter(p =>
+            Object.keys(entrySignals.negative).includes(p)
+          )
+        },
+
+        quality: {
+          score: scores.quality.score,
+          redFlags: scores.quality.redFlags
+        }
       },
 
-      entry: {
-        score: scores.entry.normalized,
-        positive: scores.entry.matched.filter(p =>
-          Object.keys(entrySignals.positive).includes(p)
-        ),
-        negative: scores.entry.matched.filter(p =>
-          Object.keys(entrySignals.negative).includes(p)
-        )
-      },
-
-      quality: {
-        score: scores.quality.score,
-        redFlags: scores.quality.redFlags
-      }
+      notes
     },
-
-    notes
   };
 }
 

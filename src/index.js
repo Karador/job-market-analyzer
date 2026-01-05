@@ -1,6 +1,7 @@
 const remoteJob = require('./fetch/remoteJob.fetch');
 const { normalizeVacancy } = require('./model/normalizeVacancy');
 const { scoreVacancy } = require('./score/scoreVacancies');
+const { explainVacancy } = require('./score/explain');
 
 async function loadVacanciesPage(path) {
   const vacancies = await remoteJob.getVacancies(path);
@@ -109,28 +110,31 @@ function penaltyStats(scored) {
     await sleep(1000);
   }
 
-  const scored = rawVacancies.map(normalizeVacancy).map(scoreVacancy);
+  const scored = rawVacancies
+    .map(normalizeVacancy)
+    .map(scoreVacancy)
+    .map(explainVacancy);
 
   console.log(scoreStats(scored));
 
   console.log(penaltyStats(scored));
 
-  // scored
-  //   .sort((a, b) => b.scores.total - a.scores.total)
-  //   .slice(0, 5)
-  //   .forEach(v => {
-  //     const values = [
-  //       v.vacancy.link,
-  //       v.explain.baseTotal,
-  //       v.explain.total,
-  //       v.explain.softPenalty,
-  //       v.explain.verdict,
-  //       v.explain.notes,
-  //       v.explain.contributions.groups,
-  //       v.explain.contributions.entry,
-  //       v.explain.contributions.quality,
-  //     ];
+  scored
+    .sort((a, b) => b.scores.total - a.scores.total)
+    .slice(0, 5)
+    .forEach(v => {
+      const values = [
+        v.vacancy.meta.link,
+        v.explain.baseTotal,
+        v.explain.total,
+        v.explain.softPenalty,
+        v.explain.verdict,
+        v.explain.notes,
+        v.explain.contributions.groups,
+        v.explain.contributions.entry,
+        v.explain.contributions.quality,
+      ];
 
-  //     values.forEach(item => console.log(item));
-  //   });
+      values.forEach(item => console.log(item));
+    });
 })();

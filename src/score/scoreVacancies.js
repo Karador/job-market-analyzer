@@ -1,5 +1,4 @@
 const { taskTypes, entrySignals, softPenalties, qualitySignals } = require('./dictionaries');
-const { explainVacancy } = require('./explain');
 
 function scoreSoftPenalties(text) {
   let penalty = 0;
@@ -114,8 +113,7 @@ function scoreVacancy(vacancy) {
     Math.min(1, baseTotal + softPenalty.penalty)
   );
 
-
-  const scored = {
+  return {
     vacancy,
     scores: {
       groups,
@@ -125,11 +123,6 @@ function scoreVacancy(vacancy) {
       baseTotal: Number(baseTotal.toFixed(2)),
       total: Number(total.toFixed(2))
     }
-  };
-
-  return {
-    ...scored,
-    explain: explainVacancy(scored)
   };
 }
 
