@@ -1,13 +1,3 @@
-// vacancy model
-
-// {
-//   meta: { site, date, salary, experience },
-//   text: { title, short, full },
-//   hygiene: { isSpam, isOld, isIntern },
-//   groups: { web, automation, data, ... },
-//   entrySignals: { learning, internship, juniorFriendly },
-// }
-
 const taskTypes = {
   web: {
     weight: 1,
@@ -41,40 +31,6 @@ const taskTypes = {
       python: 0.6
     }
   },
-  // game: [
-  //     'game', 'игр',
-  //     'unity',
-  //     'unreal',
-  //     'gamedev'
-  // ],
-  // enterprise: [
-  //     '1c', '1с',
-  //     'sap',
-  //     'oracle',
-  //     'bitrix',
-  //     'crm'
-  // ],
-  // mobile: [
-  //     'android',
-  //     'ios',
-  //     'flutter',
-  //     'react native'
-  // ],
-  // infra: [
-  //     'devops',
-  //     'docker',
-  //     'kubernetes',
-  //     'linux',
-  //     'admin',
-  //     'sysadmin'
-  // ],
-  // misc: [
-  //     'low-code',
-  //     'bpm',
-  //     'rpa',
-  //     'zapier',
-  //     'make.com'
-  // ],
 };
 
 const entrySignals = {
@@ -93,6 +49,41 @@ const entrySignals = {
   }
 };
 
+const softPenalties = {
+  experienceMismatch: {
+    phrases: [
+      'middle',
+      'middle+',
+      'senior',
+      'lead',
+      '3+',
+      '5+'
+    ],
+    penalty: -0.25
+  },
+
+  unclearSalary: {
+    phrases: [
+      'з.п. не указана',
+      'по договоренности',
+      'от 0 до',
+      'без указания зарплаты'
+    ],
+    penalty: -0.2
+  },
+
+  soloResponsibility: {
+    phrases: [
+      'вся зона ответственности',
+      'единственный разработчик',
+      'полностью твоя ответственность',
+      'самостоятельно',
+      'стартап'
+    ],
+    penalty: -0.15
+  }
+};
+
 const qualitySignals = {
   negative: {
     'помогаем найти работу': -4,
@@ -105,6 +96,29 @@ const qualitySignals = {
     'мы вас научим': -2
   }
 };
+
+function scoreSoftPenalties(text) {
+  let penalty = 0;
+  const matched = [];
+
+  for (const [key, rule] of Object.entries(softPenalties)) {
+    for (const phrase of rule.phrases) {
+      if (text.includes(phrase)) {
+        penalty += rule.penalty;
+        matched.push({ type: key, phrase, value: rule.penalty });
+        break; // важно: один штраф на правило
+      }
+    }
+  }
+
+  // ограничиваем суммарный штраф
+  penalty = Math.max(penalty, -0.4);
+
+  return {
+    penalty,
+    matched
+  };
+}
 
 
 function verdictFromScore(total) {
@@ -195,10 +209,18 @@ function scoreVacancy(vacancy) {
 
   const maxGroupScore = Math.max(...Object.values(groups.scores));
 
-  const total =
+  const softPenalty = scoreSoftPenalties(text);
+
+  const baseTotal =
     0.4 * maxGroupScore +
     0.4 * entry.normalized +
     0.2 * quality.score;
+
+  const total = Math.max(
+    0,
+    Math.min(1, baseTotal + softPenalty.penalty)
+  );
+
 
   const scored = {
     vacancy,
@@ -206,6 +228,8 @@ function scoreVacancy(vacancy) {
       groups,
       entry,
       quality,
+      softPenalty,
+      baseTotal: Number(baseTotal.toFixed(2)),
       total: Number(total.toFixed(2))
     }
   };
@@ -238,8 +262,10 @@ function explainVacancy(scored) {
   }
 
   return {
+    baseTotal: scores.baseTotal,
     total: scores.total,
     verdict: verdictFromScore(scores.total),
+    softPenalty: scores.softPenalty,
 
     contributions: {
       groups: {

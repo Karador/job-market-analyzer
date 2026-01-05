@@ -50,7 +50,9 @@ function buildPath(page) {
     .forEach(v => {
       const values = [
         v.vacancy.link,
+        v.explain.baseTotal,
         v.explain.total,
+        v.explain.softPenalty,
         v.explain.verdict,
         v.explain.notes,
         v.explain.contributions.groups,
