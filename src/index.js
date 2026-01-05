@@ -2,6 +2,8 @@ const remoteJob = require('./fetch/remoteJob.fetch');
 const { normalizeVacancy } = require('./model/normalizeVacancy');
 const { scoreVacancy } = require('./score/scoreVacancies');
 const { explainVacancy } = require('./score/explain');
+const { vacancies } = require('./config/paths');
+const { appendJsonl } = require('./storage/saveJsonl');
 
 async function loadVacanciesPage(path) {
   const vacancies = await remoteJob.getVacancies(path);
@@ -119,22 +121,34 @@ function penaltyStats(scored) {
 
   console.log(penaltyStats(scored));
 
-  scored
-    .sort((a, b) => b.scores.total - a.scores.total)
-    .slice(0, 5)
-    .forEach(v => {
-      const values = [
-        v.vacancy.meta.link,
-        v.explain.baseTotal,
-        v.explain.total,
-        v.explain.softPenalty,
-        v.explain.verdict,
-        v.explain.notes,
-        v.explain.contributions.groups,
-        v.explain.contributions.entry,
-        v.explain.contributions.quality,
-      ];
+  appendJsonl(
+    vacancies,
+    scored.map(v => ({
+      id: v.vacancy.id,
+      title: v.vacancy.title,
+      company: v.vacancy.company,
+      meta: v.vacancy.meta,
+      scores: v.scores,
+      explain: v.explain
+    }))
+  );
 
-      values.forEach(item => console.log(item));
-    });
+  // scored
+  //   .sort((a, b) => b.scores.total - a.scores.total)
+  //   .slice(0, 5)
+  //   .forEach(v => {
+  //     const values = [
+  //       v.vacancy.meta.link,
+  //       v.explain.baseTotal,
+  //       v.explain.total,
+  //       v.explain.softPenalty,
+  //       v.explain.verdict,
+  //       v.explain.notes,
+  //       v.explain.contributions.groups,
+  //       v.explain.contributions.entry,
+  //       v.explain.contributions.quality,
+  //     ];
+
+  //     values.forEach(item => console.log(item));
+  //   });
 })();

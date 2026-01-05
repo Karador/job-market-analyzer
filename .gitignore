@@ -49,3 +49,6 @@ build/
 
 # Output of 'npm pack'
 *.tgz
+
+# Runtime data
+data/
