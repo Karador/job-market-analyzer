@@ -1,8 +1,8 @@
-const { getVacancies, getLastPage } = require('./getVacancies');
-const { scoreVacancies } = require('./scoreVacancies');
+const remoteJob = require('./fetch/remoteJob.fetch');
+const { scoreVacancies } = require('./score/scoreVacancies');
 
 async function loadVacanciesPage(path) {
-  const vacancies = await getVacancies(path);
+  const vacancies = await remoteJob.getVacancies(path);
 
   if (!vacancies) {
 
@@ -94,7 +94,7 @@ function penaltyStats(scored) {
   const vacancies = [];
   const startingPage = buildPath(1);
 
-  const lastPage = await getLastPage(startingPage);
+  const lastPage = await remoteJob.getLastPage(startingPage);
   console.log(lastPage);
 
   if (!lastPage) {
