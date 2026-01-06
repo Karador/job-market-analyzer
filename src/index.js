@@ -1,38 +1,10 @@
-const remoteJob = require('./fetch/remoteJob.fetch');
-const { normalizeVacancy } = require('./model/normalizeVacancy');
-const { scoreVacancy } = require('./score/scoreVacancies');
-const { explainVacancy } = require('./score/explain');
-const { saveVacancies, loadVacancies } = require('./storage/vacancies.storage');
+const { loadVacancies } = require('./storage/vacancies.storage');
 const { markSeen, loadSeen } = require('./storage/seen.storage');
 const { analyzePenalties } = require('./analysis/analyzePenalties');
 
-const mode = process.argv[2] ?? 'analyze';
+const { runFetch } = require('./run/fetch');
 
-// scr/run/fetch.js
-async function loadVacanciesPage(path) {
-  const vacancies = await remoteJob.getVacancies(path);
-
-  if (!vacancies) {
-
-    console.log('Страница не загрузилась');
-    return [];
-
-  }
-
-  console.log(`Найдено вакансий: ${vacancies.length}`);
-  return vacancies;
-
-}
-
-// scr/run/fetch.js
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// scr/run/fetch.js
-function buildPath(page) {
-  return `/search?search%5BexactMatch%5D=0&search%5Bquery%5D=%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%81%D1%82&search%5BsearchType%5D=vacancy&alias=udalennaya-rabota-programmistom-vakansii&page=${page}&period=4`
-}
+const mode = process.argv[2] ?? 'fetch';
 
 // scr/analysis/scoreStats.js
 function scoreStats(scored) {
@@ -125,32 +97,7 @@ function penaltyStats(scored) {
 
   switch (mode) {
     case 'fetch':
-      const rawVacancies = [];
-      const startingPage = buildPath(1);
-
-      const lastPage = await remoteJob.getLastPage(startingPage);
-      console.log(lastPage);
-
-      if (!lastPage) {
-        console.log("Ошибка загрузки");
-        return
-      }
-
-      for (let page = 1; page <= lastPage; page++) {
-        const data = await loadVacanciesPage(buildPath(page));
-        rawVacancies.push(...data);
-        await sleep(1000);
-      }
-
-      const scored = rawVacancies
-        .map(normalizeVacancy)
-        .map(scoreVacancy)
-        .map(explainVacancy);
-
-      const savedCount = await saveVacancies(scored);
-      console.log(`Сохранено новых вакансий: ${savedCount}`);
-
-      // await runFetch();
+      await runFetch();
       break;
     case 'top':
       const vacancies = await loadVacancies();
