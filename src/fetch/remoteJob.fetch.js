@@ -1,10 +1,12 @@
 const cheerio = require('cheerio');
+const { buildSearchPath } = require('./remoteJob.query');
 
 const { fetchHtml } = require('./fetchHTML');
 
 const BASE_URL = 'https://remote-job.ru';
 
-async function getLastPage(path = '/') {
+async function getLastPage() {
+  const path = buildSearchPath({ page: 1 });
   const html = await fetchHtml(BASE_URL + path);
   if (!html) return null;
 
@@ -33,8 +35,8 @@ async function getVacancies(path = '/') {
     const link = anchor.attr('href');
 
     if (!title || !link) {
-        console.log(`link: ${link} title: ${title}`);
-        return;
+      console.log(`link: ${link} title: ${title}`);
+      return;
     }
 
     const company = $(element).find('small').next().text();
@@ -51,4 +53,43 @@ async function getVacancies(path = '/') {
   return vacancies;
 }
 
-module.exports = { getVacancies, getLastPage };
+async function loadVacanciesPage(page) {
+  const path = buildSearchPath({ page });
+
+  try {
+    const vacancies = await getVacancies(path);
+    console.log(`Страница ${page}: ${vacancies.length} вакансий`);
+    return vacancies;
+  } catch {
+    console.log(`Ошибка загрузки страницы ${page}`);
+    return [];
+  }
+}
+
+async function getFreshVacancies({ pages = 1, delay = 0 } = {}) {
+  const result = [];
+
+  for (let page = 1; page <= pages; page++) {
+    const vacancies = await loadVacanciesPage(page);
+    if (!vacancies?.length) break;
+
+    result.push(...vacancies);
+
+    if (delay) {
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+
+  return result;
+}
+
+async function getAllVacancies({ delay = 0 } = {}) {
+  const lastPage = await getLastPage();
+
+  return getFreshVacancies({
+    pages: lastPage,
+    delay,
+  });
+}
+
+module.exports = { getFreshVacancies, getAllVacancies };
