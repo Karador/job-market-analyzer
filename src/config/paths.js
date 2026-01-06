@@ -7,4 +7,5 @@ module.exports = {
   data: path.join(ROOT, 'data'),
 
   vacancies: path.join(ROOT, 'data', 'vacancies.jsonl'),
+  seen: path.join(ROOT, 'data', 'seen.json'),
 };

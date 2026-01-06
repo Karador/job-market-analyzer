@@ -3,6 +3,7 @@ const { normalizeVacancy } = require('./model/normalizeVacancy');
 const { scoreVacancy } = require('./score/scoreVacancies');
 const { explainVacancy } = require('./score/explain');
 const { saveVacancies, loadVacancies } = require('./storage/vacancies.storage');
+const { markSeen, loadSeen } = require('./storage/seen.storage');
 
 async function loadVacanciesPage(path) {
   const vacancies = await remoteJob.getVacancies(path);
@@ -124,14 +125,19 @@ function penaltyStats(scored) {
   console.log(`Сохранено новых вакансий: ${savedCount}`);
 
   const vacancies = await loadVacancies();
+  const seen = loadSeen();
 
   const top = vacancies
-    .filter(v => v.explain.verdict !== 'reject')
+    .filter(v => v.explain.verdict !== 'reject' && !seen[v.vacancy.id])
     .sort((a, b) => b.scores.total - a.scores.total)
     .slice(0, 10);
 
+  if (top.length) {
+    markSeen(top, 'remote-job');
+  }; 
+
   top.forEach(v => {
-    console.log(v.vacancy.title, v.scores.total);
+    console.log(v.vacancy.meta.link, v.scores.total);
   });
 
   // scored
