@@ -4,6 +4,7 @@ const { scoreVacancy } = require('./score/scoreVacancies');
 const { explainVacancy } = require('./score/explain');
 const { saveVacancies, loadVacancies } = require('./storage/vacancies.storage');
 const { markSeen, loadSeen } = require('./storage/seen.storage');
+const { analyzePenalties } = require('./analysis/analyzePenalties');
 
 async function loadVacanciesPage(path) {
   const vacancies = await remoteJob.getVacancies(path);
@@ -106,7 +107,7 @@ function penaltyStats(scored) {
     return
   }
 
-  for (let page = 1; page <= 1; page++) {
+  for (let page = 1; page <= lastPage; page++) {
     const data = await loadVacanciesPage(buildPath(page));
     rawVacancies.push(...data);
     await sleep(1000);
@@ -117,28 +118,32 @@ function penaltyStats(scored) {
     .map(scoreVacancy)
     .map(explainVacancy);
 
-  console.log(scoreStats(scored));
+  // console.log(scoreStats(scored));
 
-  console.log(penaltyStats(scored));
+  // console.log(penaltyStats(scored));
 
-  const savedCount = await saveVacancies(scored);
-  console.log(`Сохранено новых вакансий: ${savedCount}`);
+  // const savedCount = await saveVacancies(scored);
+  // console.log(`Сохранено новых вакансий: ${savedCount}`);
 
-  const vacancies = await loadVacancies();
-  const seen = loadSeen();
+  const analysis = analyzePenalties(scored);
 
-  const top = vacancies
-    .filter(v => v.explain.verdict !== 'reject' && !seen[v.vacancy.id])
-    .sort((a, b) => b.scores.total - a.scores.total)
-    .slice(0, 10);
+  console.dir(analysis, { depth: null });
 
-  if (top.length) {
-    markSeen(top, 'remote-job');
-  }; 
+  // const vacancies = await loadVacancies();
+  // const seen = loadSeen();
 
-  top.forEach(v => {
-    console.log(v.vacancy.meta.link, v.scores.total);
-  });
+  // const top = vacancies
+  //   .filter(v => v.explain.verdict !== 'reject' && !seen[v.vacancy.id])
+  //   .sort((a, b) => b.scores.total - a.scores.total)
+  //   .slice(0, 10);
+
+  // if (top.length) {
+  //   markSeen(top, 'remote-job');
+  // }; 
+
+  // top.forEach(v => {
+  //   console.log(v.vacancy.meta.link, v.scores.total);
+  // });
 
   // scored
   //   .sort((a, b) => b.scores.total - a.scores.total)
