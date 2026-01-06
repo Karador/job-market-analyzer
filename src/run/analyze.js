@@ -1,0 +1,14 @@
+const { loadVacancies } = require('../storage/vacancies.storage');
+const { analyzePenalties } = require('../analysis/analyzePenalties');
+const { scoreStats } = require('../analysis/scoreStats');
+const { penaltyStats } = require('../analysis/penaltyStats');
+
+async function runAnalyze() {
+    const scoredVacancies = await loadVacancies();
+
+    console.log(scoreStats(scoredVacancies));
+    console.log(penaltyStats(scoredVacancies));
+    console.log(analyzePenalties(scoredVacancies));
+}
+
+module.exports = { runAnalyze };
