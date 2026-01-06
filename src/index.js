@@ -1,10 +1,10 @@
 const { loadVacancies } = require('./storage/vacancies.storage');
-const { markSeen, loadSeen } = require('./storage/seen.storage');
 const { analyzePenalties } = require('./analysis/analyzePenalties');
 
 const { runFetch } = require('./run/fetch');
+const { runTop } = require('./run/top');
 
-const mode = process.argv[2] ?? 'fetch';
+const mode = process.argv[2] ?? 'top';
 
 // scr/analysis/scoreStats.js
 function scoreStats(scored) {
@@ -100,23 +100,7 @@ function penaltyStats(scored) {
       await runFetch();
       break;
     case 'top':
-      const vacancies = await loadVacancies();
-      const seen = loadSeen();
-
-      const top = vacancies
-        .filter(v => v.explain.verdict !== 'reject' && !seen[v.vacancy.id])
-        .sort((a, b) => b.scores.total - a.scores.total)
-        .slice(0, 5);
-
-      if (top.length) {
-        markSeen(top, 'remote-job');
-      };
-
-      top.forEach(v => {
-        console.log(v.vacancy.meta.link, v.scores.total);
-      });
-
-      // await runTop();
+      await runTop();
       break;
     case 'analyze':
       const scoredVacancies = await loadVacancies();
