@@ -2,8 +2,7 @@ const remoteJob = require('./fetch/remoteJob.fetch');
 const { normalizeVacancy } = require('./model/normalizeVacancy');
 const { scoreVacancy } = require('./score/scoreVacancies');
 const { explainVacancy } = require('./score/explain');
-const { vacancies } = require('./config/paths');
-const { appendJsonl } = require('./storage/saveJsonl');
+const { saveVacancies, loadVacancies } = require('./storage/vacancies.storage');
 
 async function loadVacanciesPage(path) {
   const vacancies = await remoteJob.getVacancies(path);
@@ -106,7 +105,7 @@ function penaltyStats(scored) {
     return
   }
 
-  for (let page = 1; page <= lastPage; page++) {
+  for (let page = 1; page <= 1; page++) {
     const data = await loadVacanciesPage(buildPath(page));
     rawVacancies.push(...data);
     await sleep(1000);
@@ -121,17 +120,19 @@ function penaltyStats(scored) {
 
   console.log(penaltyStats(scored));
 
-  appendJsonl(
-    vacancies,
-    scored.map(v => ({
-      id: v.vacancy.id,
-      title: v.vacancy.title,
-      company: v.vacancy.company,
-      meta: v.vacancy.meta,
-      scores: v.scores,
-      explain: v.explain
-    }))
-  );
+  const savedCount = await saveVacancies(scored);
+  console.log(`Сохранено новых вакансий: ${savedCount}`);
+
+  const vacancies = await loadVacancies();
+
+  const top = vacancies
+    .filter(v => v.explain.verdict !== 'reject')
+    .sort((a, b) => b.scores.total - a.scores.total)
+    .slice(0, 10);
+
+  top.forEach(v => {
+    console.log(v.vacancy.title, v.scores.total);
+  });
 
   // scored
   //   .sort((a, b) => b.scores.total - a.scores.total)
