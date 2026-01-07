@@ -24,7 +24,37 @@ function extractId(link) {
   return match ? match[1] : null;
 }
 
-function normalizeVacancy(raw) {
+function normalizeHabr(raw) {
+  const v = raw.vacancy;
+
+  const title = cleanText(v.title);
+
+  const text = [
+    title,
+    ...(v.skills || [])
+  ].join('\n');
+
+  return {
+    id: v.id,
+    title,
+    company: cleanText(v.company?.name),
+    text,
+    salary: { from: null, to: null, currency: null },
+    skills: v.skills || [],
+
+    meta: {
+      source: 'habr-career',
+      link: v.meta.link,
+      experience: v.meta.experience || null,
+      remote: Boolean(v.meta.remote),
+      employment: v.meta.employment || null,
+      date: v.date || null,
+      companyRating: v.company?.rating ?? null,
+    }
+  };
+}
+
+function normalizeRemoteJob(raw) {
   const title = cleanText(raw.title);
   const company = cleanText(raw.company);
   const description = cleanText(raw.description);
@@ -42,6 +72,18 @@ function normalizeVacancy(raw) {
       link: raw.link
     }
   };
+}
+
+function normalizeVacancy(raw) {
+  if (raw.source === 'remote-job') {
+    return normalizeRemoteJob(raw);
+  }
+
+  if (raw.source === 'habr-career') {
+    return normalizeHabr(raw);
+  }
+
+  throw new Error(`Unknown source: ${raw.source}`);
 }
 
 module.exports = { normalizeVacancy };

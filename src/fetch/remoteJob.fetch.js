@@ -43,6 +43,7 @@ async function getVacancies(path = '/') {
     const description = $(element).find('div').first().text();
 
     vacancies.push({
+      source: 'remote-job',
       title,
       company,
       description,
