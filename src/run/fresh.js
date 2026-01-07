@@ -2,7 +2,7 @@ const { getFreshVacancies } = require('../fetch/remoteJob.fetch');
 const { normalizeVacancy } = require('../model/normalizeVacancy');
 const { scoreVacancy } = require('../score/scoreVacancies');
 const { explainVacancy } = require('../score/explain');
-
+const { vacancyKey } = require('../utils/vacancyKey');
 const { loadVacancies, saveVacancies } = require('../storage/vacancies.storage');
 const { loadSeen, markSeen } = require('../storage/seen.storage');
 
@@ -28,14 +28,14 @@ async function runFresh({
   const stored = await loadVacancies();
   const seen = loadSeen();
 
-  const storedIds = new Set(
-    stored.map(v => v.vacancy.id)
+  const storedKeys = new Set(
+    stored.map(vacancyKey)
   );
 
   const candidates = freshScored
     .filter(v =>
-      !storedIds.has(v.vacancy.id) &&
-      !seen[v.vacancy.id] &&
+      !storedKeys.has(vacancyKey(v)) &&
+      !seen[vacancyKey(v)] &&
       v.explain.verdict !== 'reject'
     )
     .sort((a, b) => b.scores.total - a.scores.total)
@@ -49,7 +49,7 @@ async function runFresh({
   await saveVacancies(freshScored);
 
   if (process.env.NODE_ENV === 'production') {
-    markSeen(candidates, 'remote-job');
+    markSeen(candidates);
   }
 
   candidates.forEach(v => {

@@ -13,7 +13,7 @@ async function runTop({ limit } = { limit: 5 }) {
     const shouldMarkSeen = process.env.NODE_ENV === 'production';
 
     if (top.length && shouldMarkSeen) {
-        markSeen(top, 'remote-job');
+        markSeen(top);
     }
 
     top.forEach(v => {

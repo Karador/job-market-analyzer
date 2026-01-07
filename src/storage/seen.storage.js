@@ -1,5 +1,6 @@
 const fs = require('fs');
 const paths = require('../config/paths');
+const { vacancyKey, vacancyKeyByParts } = require('../utils/vacancyKey');
 
 function loadSeen() {
   if (!fs.existsSync(paths.seen)) {
@@ -20,25 +21,26 @@ function saveSeen(seen) {
   );
 }
 
-function markSeen(vacancies, source) {
+function markSeen(vacancies) {
   const seen = loadSeen();
   const now = new Date().toISOString();
 
   let added = 0;
 
   for (const v of vacancies) {
-    const id = v?.id || v?.vacancy?.id;
-    if (!id) continue;
+    if (!v?.vacancy?.id || !v?.vacancy.meta.source) continue;
 
-    if (!seen[id]) {
-      seen[id] = {
+    const key = vacancyKey(v);
+
+    if (!seen[key]) {
+      seen[key] = {
         firstSeen: now,
         lastSeen: now,
-        source,
+        sourse: v.vacancy.meta.source,
       };
       added++;
     } else {
-      seen[id].lastSeen = now;
+      seen[key].lastSeen = now;
     }
   }
 
@@ -46,9 +48,10 @@ function markSeen(vacancies, source) {
   return added;
 }
 
-function isSeen(id) {
+function isSeen(sourse, id) {
   const seen = loadSeen();
-  return Boolean(seen[id]);
+  const key = vacancyKeyByParts(sourse, id);
+  return Boolean(seen[key]);
 }
 
 module.exports = {
