@@ -1,10 +1,8 @@
 const { getFreshVacancies } = require('../fetch/remoteJob.fetch');
-const { normalizeVacancy } = require('../model/normalizeVacancy');
-const { scoreVacancy } = require('../score/scoreVacancies');
-const { explainVacancy } = require('../score/explain');
 const { vacancyKey } = require('../utils/vacancyKey');
 const { loadVacancies, saveVacancies } = require('../storage/vacancies.storage');
 const { loadSeen, markSeen } = require('../storage/seen.storage');
+const { processRaw } = require('../model/processVacancies');
 
 async function runFresh({
   pages = 1,
@@ -20,10 +18,7 @@ async function runFresh({
     return;
   }
 
-  const freshScored = raw
-    .map(normalizeVacancy)
-    .map(scoreVacancy)
-    .map(explainVacancy);
+  const freshScored = processRaw(raw);
 
   const stored = await loadVacancies();
   const seen = loadSeen();
