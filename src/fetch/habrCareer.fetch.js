@@ -140,8 +140,30 @@ async function fetchHabrVacancies({
   return parseVacancies(html);
 }
 
+async function getAllVacancies({
+  pages = 5,
+  delay = 0,
+  ...filters
+} = {}) {
+  const all = [];
+
+  for (let page = 1; page <= pages; page++) {
+    const batch = await fetchHabrVacancies({ page, ...filters });
+    if (!batch.length) break;
+
+    all.push(...batch);
+
+    if (delay) {
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+
+  return all;
+}
+
 module.exports = {
   fetchHabrVacancies,
+  getAllVacancies,
 };
 
 /**
@@ -149,7 +171,7 @@ module.exports = {
  */
 if (require.main === module) {
   (async () => {
-    const res = await fetchHabrVacancies({ page: 1 });
-    console.log(res.slice(0, 2));
+    const res = await getAllVacancies({ page: 1 });
+    console.log(res.length);
   })();
 }
