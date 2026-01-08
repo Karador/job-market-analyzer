@@ -61,6 +61,8 @@ function normalizeRemoteJob(raw) {
 
   const text = `${title}\n${description}`;
 
+  const remote = /удалённ/i.test(text) || /удаленн/i.test(text);
+
   return {
     id: extractId(raw.link),
     title,
@@ -69,7 +71,8 @@ function normalizeRemoteJob(raw) {
     salary: extractSalary(description),
     meta: {
       source: 'remote-job',
-      link: raw.link
+      link: raw.link,
+      remote
     }
   };
 }
