@@ -133,7 +133,11 @@ async function fetchHabrVacancies({
   page = 1,
   ...filters
 } = {}) {
-  const path = buildVacanciesPath({ page, ...filters });
+  const path = buildVacanciesPath({
+    page,
+    specializations: [3, 4, 82],
+  });
+  ;
   const url = `${BASE_URL}${path}`;
 
   const html = await fetchHtml(url);
