@@ -1,17 +1,40 @@
 const axios = require('axios');
 
-async function fetchHtml(path) {
+const DEFAULT_HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0',
+  'Accept':
+    'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+  'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+  'Connection': 'keep-alive',
+  'Upgrade-Insecure-Requests': '1',
+};
+
+async function fetchHtml(url, options = {}) {
+  const {
+    referer,
+    headers = {},
+  } = options;
+
   try {
-    const response = await axios.get(`${path}`, {
+    const response = await axios.get(url, {
       timeout: 10000,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-        'Accept-Language': 'ru-RU,ru;q=0.9,en;q=0.8'
-      }
+        ...DEFAULT_HEADERS,
+        ...(referer ? { Referer: referer } : {}),
+        ...headers,
+      },
+      validateStatus: status => status < 500,
     });
+
+    if (response.status !== 200) {
+      console.log(`[fetchHtml] ${response.status} ${url}`);
+      return null;
+    }
 
     return response.data;
   } catch (error) {
+    console.log('[fetchHtml error]', error.message);
     return null;
   }
 }
