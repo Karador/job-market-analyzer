@@ -3,7 +3,7 @@ const { runTop } = require('./run/top');
 const { runAnalyze } = require('./run/analyze');
 const { runFresh } = require('./run/fresh');
 
-const mode = process.argv[2] ?? 'fresh';
+const mode = process.argv[2] ?? 'top';
 
 (async () => {
   switch (mode) {
