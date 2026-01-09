@@ -8,7 +8,8 @@ function verdictFromScore(total) {
 }
 
 function explainVacancy(scored) {
-  const { scores } = scored;
+  const { scores, vacancy } = scored;
+  const { tech } = vacancy;
 
   const groupEntries = Object.entries(scores.groups.scores);
   const [bestGroup, bestGroupScore] =
@@ -35,12 +36,17 @@ function explainVacancy(scored) {
       total: scores.total,
       verdict: verdictFromScore(scores.total),
       softPenalty: scores.softPenalty,
+      technologies: tech.technologies,
+      tags: tech.tags,
 
       contributions: {
         groups: {
           chosen: bestGroup,
           score: bestGroupScore,
-          matched: scores.groups.matches[bestGroup]
+          matched: scores.groups.matches[bestGroup],
+          tech: Object.keys(tech.technologies).filter(t =>
+            scores.groups.matches[bestGroup].some(m => m.word === t)
+          )
         },
 
         entry: {

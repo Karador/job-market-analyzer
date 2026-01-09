@@ -59,7 +59,7 @@ const softPenalties = {
       '3+',
       '5+'
     ],
-    penalty: -0.25
+    penalty: -0.35
   },
 
   unclearSalary: {
@@ -69,7 +69,7 @@ const softPenalties = {
       'от 0 до',
       'без указания зарплаты'
     ],
-    penalty: -0.2
+    penalty: -0.1
   },
 
   soloResponsibility: {

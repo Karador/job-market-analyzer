@@ -95,7 +95,9 @@ function scoreGroups(text) {
 function scoreVacancy(vacancy) {
   const text = vacancy.text;
 
-  const groups = scoreGroups(text);
+  const tech = vacancy.tech;
+
+  const groups = scoreGroups(tech.tags);
   const entry = scoreEntry(text);
   const quality = scoreQuality(text);
 

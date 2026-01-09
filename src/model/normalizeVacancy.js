@@ -1,3 +1,5 @@
+const { normalizeTechnologies } = require('../analysis/techNormalizer');
+
 function cleanText(str) {
   if (!str) return '';
   return str
@@ -41,6 +43,7 @@ function normalizeHH(raw) {
     company: cleanText(v.company),
     text,
     salary: { from: null, to: null, currency: null },
+    tech: normalizeTechnologies(text),
 
     meta: {
       source: 'hh',
@@ -68,6 +71,7 @@ function normalizeHabr(raw) {
     text,
     salary: { from: null, to: null, currency: null },
     skills: v.skills || [],
+    tech: normalizeTechnologies(text),
 
     meta: {
       source: 'habr-career',
@@ -96,6 +100,7 @@ function normalizeRemoteJob(raw) {
     company,
     text,
     salary: extractSalary(description),
+    tech: normalizeTechnologies(text),
     meta: {
       source: 'remote-job',
       link: raw.link,

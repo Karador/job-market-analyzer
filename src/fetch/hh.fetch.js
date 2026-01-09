@@ -12,8 +12,9 @@ async function getLastPage() {
         page: 0,
         professionalRole: 96,
         education: "not_required_or_not_specified",
+        excluded_text: "python,java,golang,qa,1c,1с,senior,android,ios,flutter",
     });
-    
+
     const html = await fetchHtml(BASE_URL + path, {
         referer: BASE_URL,
     });
@@ -26,7 +27,7 @@ async function getLastPage() {
         .get()
         .join('')
 
-    return Math.ceil(pages ? pages / 50 : 0);
+    return Math.min(Math.ceil(pages ? pages / 50 : 0), 39);
 }
 
 /**
@@ -82,8 +83,8 @@ async function loadVacanciesPage(page) {
     const path = buildHHVacanciesPath({
         page,
         professionalRole: 96,
-        industry: 7,
         education: "not_required_or_not_specified",
+        excluded_text: "python,java,golang,qa,1c,1с,senior,android,ios,flutter",
     });
 
     try {
@@ -99,7 +100,7 @@ async function loadVacanciesPage(page) {
 /**
  * Загрузка первых N страниц
  */
-async function getFreshVacancies({ pages = 1, delay = 2000 } = {}) {
+async function getFreshVacancies({ pages = 1, delay = 3000 } = {}) {
     const result = [];
 
     for (let page = 0; page < pages; page++) {
@@ -119,7 +120,7 @@ async function getFreshVacancies({ pages = 1, delay = 2000 } = {}) {
 /**
  * Загрузка всех страниц
  */
-async function getAllVacancies({ delay = 2000 } = {}) {
+async function getAllVacancies({ delay = 3000 } = {}) {
     const lastPage = await getLastPage();
     if (lastPage === null) return [];
 

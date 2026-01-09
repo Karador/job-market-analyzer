@@ -1,9 +1,10 @@
 function buildHHVacanciesPath({
   page = 0,
+  excluded_text,
   text,                  // дополнительный текст поиска
   area,
-  workFormat = "REMOTE", // REMOTE | HYBRID | OFFICE
-  employmentForm = "FULL", // FULL | PART_TIME | PROJECT
+  workFormat,            // REMOTE | HYBRID | OFFICE
+  employmentForm,        // FULL | PART_TIME | PROJECT
   professionalRole,      // role ID, например 96
   industry,              // industry ID
   education,             // education filter
@@ -20,6 +21,7 @@ function buildHHVacanciesPath({
   params.set("enable_snippets", "true");
   params.set("L_save_area", "true");
 
+  if (excluded_text) params.set("excluded_text", excluded_text);
   if (text) params.set("text", text);
 
   if (area) params.set("area", area);
