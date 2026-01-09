@@ -41,17 +41,17 @@ async function getVacancies(path) {
 
     $('[data-qa="vacancy-serp__vacancy"]').each((_, el) => {
         const title = $(el).find('[data-qa="serp-item__title-text"]').first().text();
-        const text = $(el).find('[data-qa="vacancy-serp__vacancy_snippet_responsibility"]').text()
+        const description = $(el).find('[data-qa="vacancy-serp__vacancy_snippet_responsibility"]').text()
             + ' ' + $(el).find('[data-qa="vacancy-serp__vacancy_snippet_requirement"]').text()
             + ' ' + $(el).find('[data-qa^="vacancy-serp__vacancy-compensation"]').first().text()
-            + ' ' + $(el).find('[data-qa^="vacancy-serp__vacancy-work-experience-noExperience"]').first().text()
-            + ' ' + $(el).find('[data-qa="vacancy-serp__vacancy-work-experience-between3And6"]').first().text()
-            + ' ' + $(el).find('[data-qa="vacancy-serp__vacancy-work-experience-between1And3"]').first().text()
             + ' ' + $(el).find('[data-qa="vacancy-serp__vacancy-compensation-frequency-MONTHLY"]').first().text()
             + ' ' + $(el).find('[data-qa="vacancy-label-side-job"]').first().text();
         const link = $(el).find('[data-qa="serp-item__title"]').first().attr('href');
         const company = $(el).find('[data-qa="vacancy-serp__vacancy-employer-text"]').first().text();
         const isRemote = Boolean($(el).find('[data-qa="vacancy-label-work-schedule-remote"]').length);
+        const experience = $(el).find('[data-qa^="vacancy-serp__vacancy-work-experience-noExperience"]').first().text()
+           || $(el).find('[data-qa="vacancy-serp__vacancy-work-experience-between3And6"]').first().text()
+           || $(el).find('[data-qa="vacancy-serp__vacancy-work-experience-between1And3"]').first().text();
 
         const idMatch = link.match(/\/vacancy\/(\d+)/);
         const id = idMatch ? idMatch[1] : null;
@@ -64,9 +64,10 @@ async function getVacancies(path) {
             id,
             source: 'hh',
             title,
-            text,
+            description,
             company,
             isRemote,
+            experience,
             link: link.startsWith('http') ? link : BASE_URL + link,
         });
     });

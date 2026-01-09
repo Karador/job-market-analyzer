@@ -18,7 +18,7 @@ async function fetchHtml(url, options = {}) {
 
   try {
     const response = await axios.get(url, {
-      timeout: 10000,
+      timeout: 20000,
       headers: {
         ...DEFAULT_HEADERS,
         ...(referer ? { Referer: referer } : {}),

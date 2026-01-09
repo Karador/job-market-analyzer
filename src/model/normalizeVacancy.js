@@ -24,6 +24,33 @@ function extractId(link) {
   return match ? match[1] : null;
 }
 
+function normalizeHH(raw) {
+  const v = raw;
+
+  const title = cleanText(v.title);
+  const description = cleanText(v.description);
+
+  const text = [
+    title,
+    description,
+  ].join('\n');
+
+  return {
+    id: v.id,
+    title,
+    company: cleanText(v.company),
+    text,
+    salary: { from: null, to: null, currency: null },
+
+    meta: {
+      source: 'hh',
+      link: v.link,
+      experience: v.experience || null,
+      remote: v.isRemote,
+    }
+  };
+}
+
 function normalizeHabr(raw) {
   const v = raw.vacancy;
 
@@ -84,6 +111,10 @@ function normalizeVacancy(raw) {
 
   if (raw.source === 'habr-career') {
     return normalizeHabr(raw);
+  }
+
+  if (raw.source === 'hh') {
+    return normalizeHH(raw);
   }
 
   throw new Error(`Unknown source: ${raw.source}`);

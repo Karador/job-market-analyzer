@@ -1,5 +1,6 @@
 const { getFreshVacancies: getFreshRemoteJobVacancies } = require('../fetch/remoteJob.fetch');
 const { getAllVacancies: getFreshHabrVacancies } = require('../fetch/habrCareer.fetch');
+const { getFreshVacancies: getFreshHHVacancies } = require('../fetch/hh.fetch');
 const { vacancyKey } = require('../utils/vacancyKey');
 const { loadVacancies, saveVacancies } = require('../storage/vacancies.storage');
 const { loadSeen, markSeen } = require('../storage/seen.storage');
@@ -9,20 +10,23 @@ async function runFresh({
   pages = 1,
   limit = 5,
 } = {}) {
-  const delay = process.env.NODE_ENV === 'production' ? 1000 : 0;
+  const delay = process.env.NODE_ENV === 'production' ? 2000 : 0;
 
   // TODO: stop fetching when vacancy already exists in storage
   const [
     remoteRaw,
     habrRaw,
+    hhRaw,
   ] = await Promise.all([
     getFreshRemoteJobVacancies({ pages, delay }),
     getFreshHabrVacancies({ pages, delay }),
+    getFreshHHVacancies({ pages, delay }),
   ]);
 
   const raw = [
     ...remoteRaw,
     ...habrRaw,
+    ...hhRaw,
   ];
 
   if (!raw.length) {

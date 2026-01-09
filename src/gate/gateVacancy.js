@@ -80,8 +80,6 @@ function gateVacancy(vacancy) {
   // Пропуск
   const pass = reasons.every(r => r.type !== "reject") || reasons.length === 0;
 
-  console.log(vacancy, pass)
-
   return {
     pass,
     reasons,
