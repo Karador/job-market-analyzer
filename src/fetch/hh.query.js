@@ -1,7 +1,7 @@
 function buildHHVacanciesPath({
   page = 0,
   text,                  // дополнительный текст поиска
-  area = 1,              // по умолчанию RU (МСК)
+  area,
   workFormat = "REMOTE", // REMOTE | HYBRID | OFFICE
   employmentForm = "FULL", // FULL | PART_TIME | PROJECT
   professionalRole,      // role ID, например 96
@@ -22,7 +22,7 @@ function buildHHVacanciesPath({
 
   if (text) params.set("text", text);
 
-  params.set("area", area);
+  if (area) params.set("area", area);
 
   if (workFormat) params.set("work_format", workFormat);
   if (employmentForm) params.set("employment_form", employmentForm);

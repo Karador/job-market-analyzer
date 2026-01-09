@@ -11,10 +11,9 @@ async function getLastPage() {
     const path = buildHHVacanciesPath({
         page: 0,
         professionalRole: 96,
-        industry: 7,
         education: "not_required_or_not_specified",
     });
-    ;
+    
     const html = await fetchHtml(BASE_URL + path, {
         referer: BASE_URL,
     });
@@ -25,8 +24,9 @@ async function getLastPage() {
     const pages = $('[data-qa="vacancies-search-header"]')
         .map((_, el) => $(el).text().match(/\d+(\.\d+)?/g))
         .get()
+        .join('')
 
-    return Math.ceil(pages[0] ? pages[0] / 50 : 0);
+    return Math.ceil(pages ? pages / 50 : 0);
 }
 
 /**

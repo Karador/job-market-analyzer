@@ -18,7 +18,7 @@ async function runFetch() {
   ] = await Promise.all([
     getRemoteVacancies({ delay }),
     getHabrVacancies({ delay }),
-    getHHVacancies({ delay }),
+    getHHVacancies({ delay: 5000 }),
   ]);
 
   const raw = [
