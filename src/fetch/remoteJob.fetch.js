@@ -59,7 +59,7 @@ async function loadVacanciesPage(page) {
 
   try {
     const vacancies = await getVacancies(path);
-    console.log(`Страница ${page}: ${vacancies.length} вакансий`);
+    console.log(`Remote-Job страница ${page}: ${vacancies.length} вакансий`);
     return vacancies;
   } catch {
     console.log(`Ошибка загрузки страницы ${page}`);

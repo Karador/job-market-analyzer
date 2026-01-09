@@ -152,10 +152,11 @@ async function getAllVacancies({
   const all = [];
 
   for (let page = 1; page <= pages; page++) {
-    const batch = await fetchHabrVacancies({ page, ...filters });
-    if (!batch.length) break;
+    const vacancies = await fetchHabrVacancies({ page, ...filters });
+    console.log(`HabrCareer страница ${page}: ${vacancies.length} вакансий`);
+    if (!vacancies.length) break;
 
-    all.push(...batch);
+    all.push(...vacancies);
 
     if (delay) {
       await new Promise(r => setTimeout(r, delay));

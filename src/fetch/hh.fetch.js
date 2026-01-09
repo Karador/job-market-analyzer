@@ -124,7 +124,7 @@ async function getAllVacancies({ delay = 2000 } = {}) {
     if (lastPage === null) return [];
 
     return getFreshVacancies({
-        pages: 1,
+        pages: lastPage,
         delay,
     });
 }
