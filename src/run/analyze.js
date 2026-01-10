@@ -3,6 +3,7 @@ const { analyzePenalties } = require('../analysis/analyzePenalties');
 const { scoreStats } = require('../analysis/scoreStats');
 const { penaltyStats } = require('../analysis/penaltyStats');
 const { markedStats } = require('../analysis/markedStats');
+const { marketProfile } = require('../analysis/marketProfile');
 
 async function runAnalyze() {
     const scoredVacancies = await loadVacancies();
@@ -11,6 +12,7 @@ async function runAnalyze() {
     console.log(penaltyStats(scoredVacancies));
     console.log(analyzePenalties(scoredVacancies));
     console.dir(markedStats(scoredVacancies), { depth: null });
+    console.dir(marketProfile(scoredVacancies), { depth: null });
 }
 
 module.exports = { runAnalyze };
