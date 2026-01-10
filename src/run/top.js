@@ -1,12 +1,13 @@
 const { loadVacancies } = require('../storage/vacancies.storage');
 const { markSeen, loadSeen } = require('../storage/seen.storage');
+const { vacancyKey } = require('../utils/vacancyKey');
 
 async function runTop({ limit } = { limit: 5 }) {
     const vacancies = await loadVacancies();
     const seen = loadSeen();
 
     const top = vacancies
-        .filter(v => v.explain.verdict !== 'reject' && !seen[v.vacancy.id])
+        .filter(v => v.explain.verdict !== 'reject' && !seen[vacancyKey(v)])
         .sort((a, b) => b.scores.total - a.scores.total)
         .slice(0, limit);
 
