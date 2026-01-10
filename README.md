@@ -61,10 +61,16 @@ At a high level, the data flow looks like this:
 
 raw vacancies
   → normalization
+    → text & fields normalization
+    → technology normalization
   → gate filtering
   → scoring
   → explanation
   → local storage
+
+Normalization produces a stable internal vacancy model.
+This includes derived fields such as detected technologies,
+which are later used by gate and scoring without re-parsing raw text.
 
 Each step has a single responsibility and can be adjusted independently.
 

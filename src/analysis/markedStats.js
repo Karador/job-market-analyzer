@@ -8,7 +8,7 @@ const ALWAYS_KEEP = new Set([
 ]);
 
 const STOPWORDS = new Set([
-  'and','in','of','with','you','it','end','years'
+  'and','in','of','with','you','it','end','years', 'experience',
 ]);
 
 function bucket(score) {

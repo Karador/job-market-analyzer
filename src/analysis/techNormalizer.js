@@ -43,8 +43,8 @@ function includesAny(text, phrases = []) {
   return phrases.some(p => text.includes(p));
 }
 
-function normalizeTechnologies(rawText) {
-  const text = rawText.toLowerCase();
+function normalizeTechnologies(vacancy) {
+  const text = vacancy.text.toLowerCase();
 
   const technologies = {};
   const tags = [];
@@ -91,10 +91,13 @@ function normalizeTechnologies(rawText) {
   }
 
   return {
-    technologies,
-    tags,
-    meta,
-  };
+    ...vacancy,
+    tech: {
+      technologies,
+      tags,
+      meta,
+    },
+  }
 }
 
 module.exports = { normalizeTechnologies };
