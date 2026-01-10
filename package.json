@@ -1,5 +1,5 @@
 {
-  "name": "job-posting-parser",
+  "name": "job-market-analyzer",
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
