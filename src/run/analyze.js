@@ -5,6 +5,7 @@ const { penaltyStats } = require('../analysis/penaltyStats');
 const { markedStats } = require('../analysis/markedStats');
 const { marketProfile } = require('../analysis/marketProfile');
 const { skillGapFromTopKeywords } = require('../analysis/skillGapFromTopKeywords');
+const { marketRoleProfile } = require('../analysis/marketRoleProfile');
 
 async function runAnalyze() {
     const scoredVacancies = await loadVacancies();
@@ -15,6 +16,7 @@ async function runAnalyze() {
     console.dir(markedStats(scoredVacancies), { depth: null });
     console.dir(marketProfile(scoredVacancies), { depth: null });
     console.dir(skillGapFromTopKeywords(scoredVacancies), { depth: null });
+    console.dir(marketRoleProfile(scoredVacancies), { depth: null });
 }
 
 module.exports = { runAnalyze };
