@@ -10,9 +10,9 @@ const { marketRoleProfile } = require('../analysis/marketRoleProfile');
 async function runAnalyze() {
     const scoredVacancies = await loadVacancies();
 
-    console.log(scoreStats(scoredVacancies));
-    console.log(penaltyStats(scoredVacancies));
-    console.log(analyzePenalties(scoredVacancies));
+    console.log("stats: ", scoreStats(scoredVacancies));
+    console.log("penalties: ", penaltyStats(scoredVacancies));
+    console.log("analyze penalties ", analyzePenalties(scoredVacancies));
     console.dir(markedStats(scoredVacancies), { depth: null });
     console.dir(marketProfile(scoredVacancies), { depth: null });
     console.dir(skillGapFromTopKeywords(scoredVacancies), { depth: null });

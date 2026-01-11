@@ -1,3 +1,12 @@
+const CURRENCY_MAP = {
+  USD: [/\$/, /\bUSD\b/i],
+  EUR: [/€/, /\bEUR\b/i],
+  RUB: [/₽/, /\bруб\.?\b/i, /\bрублей\b/i, /\bRUB\b/i],
+  BYN: [/\bBr\b/i, /\bBYN\b/i],
+};
+
+const NUMBER_RE = /\d[\d\s ]*/g; // обычные + неразрывные пробелы
+
 function cleanText(str) {
   if (!str) return '';
   return str
@@ -6,17 +15,34 @@ function cleanText(str) {
     .trim();
 }
 
+function normalizeNumber(str) {
+  return Number(str.replace(/[^\d]/g, ""));
+}
+
 function extractSalary(text) {
   if (!text) return { from: null, to: null, currency: null };
 
-  const match = text.match(/от\s*([\d\s]+)\s*до\s*([\d\s]+)\s*(руб|₽)/i);
-  if (!match) return { from: null, to: null, currency: null };
+  const numbers = text.match(NUMBER_RE);
+  if (!numbers || numbers.length < 2) {
+    return { from: null, to: null, currency: null };
+  }
 
-  return {
-    from: Number(match[1].replace(/\s/g, '')),
-    to: Number(match[2].replace(/\s/g, '')),
-    currency: 'RUB'
-  };
+  const from = normalizeNumber(numbers[0]);
+  const to = normalizeNumber(numbers[1]);
+
+  let currency = null;
+  for (const [code, patterns] of Object.entries(CURRENCY_MAP)) {
+    if (patterns.some(re => re.test(text))) {
+      currency = code;
+      break;
+    }
+  }
+
+  if (!currency) {
+    return { from: null, to: null, currency: null };
+  }
+
+  return { from, to, currency };
 }
 
 function extractId(link) {
@@ -66,7 +92,7 @@ function normalizeHabr(raw) {
     title,
     company: cleanText(v.company?.name),
     text,
-    salary: { from: null, to: null, currency: null },
+    salary: extractSalary(v.salary),
     skills: v.skills || [],
 
     meta: {

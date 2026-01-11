@@ -18,7 +18,7 @@ function parseMeta($, $card) {
 
     if (!text) return;
 
-    if (['Junior', 'Middle', 'Senior', 'Lead'].includes(text)) {
+    if (['Intern', 'Junior', 'Middle', 'Senior', 'Lead'].includes(text)) {
       meta.experience = text;
       return;
     }
@@ -98,6 +98,8 @@ function parseVacancies(html) {
       .map(s => s.trim())
       .filter(Boolean);
 
+    const salary = $card.find('.basic-salary').text() || null;
+
     const meta = parseMeta($, $card);
 
     result.push({
@@ -107,6 +109,7 @@ function parseVacancies(html) {
         id,
         title,
         date,
+        salary,
 
         meta: {
           link,
