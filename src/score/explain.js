@@ -1,72 +1,41 @@
-const { entrySignals } = require('./dictionaries');
-
-function verdictFromScore(total) {
-  if (total >= 0.7) return 'strong_match';
-  if (total >= 0.45) return 'maybe';
-  if (total >= 0.25) return 'weak';
-  return 'reject';
-}
-
 function explainVacancy(scored) {
-  const { scores, vacancy } = scored;
-  const { tech } = vacancy;
-
-  const groupEntries = Object.entries(scores.groups.scores);
-  const [bestGroup, bestGroupScore] =
-    groupEntries.sort((a, b) => b[1] - a[1])[0];
+  const { vacancy, scores } = scored;
+  const { breakdown, meta, total } = scores;
 
   const notes = [];
 
-  if (bestGroupScore > 0.7) {
-    notes.push(`Сильный ${bestGroup}-профиль`);
+  if (breakdown.coreProfile >= 0.9) {
+    notes.push('Высокое качество вакансии');
   }
 
-  if (scores.entry.raw > 0) {
-    notes.push('Есть junior/entry сигналы');
+  if (breakdown.stackBonus > 0) {
+    notes.push(
+      meta.hasNode
+        ? 'Frontend + Node.js профиль'
+        : 'Frontend + backend профиль'
+    );
   }
 
-  if (scores.quality.redFlags.length > 0) {
-    notes.push('Есть признаки спама/обучения');
+  if (breakdown.entryBonus > 0) {
+    notes.push('Есть entry/junior сигналы');
+  }
+
+  if (breakdown.softPenalty < 0) {
+    notes.push('Есть смягчающие факторы (неясные условия, риски)');
+  }
+
+  if (meta.hasRedFlags) {
+    notes.push('Обнаружены негативные сигналы');
   }
 
   return {
     ...scored,
     explain: {
-      baseTotal: scores.baseTotal,
-      total: scores.total,
-      verdict: verdictFromScore(scores.total),
-      softPenalty: scores.softPenalty,
-      technologies: tech.technologies,
-      tags: tech.tags,
-
-      contributions: {
-        groups: {
-          chosen: bestGroup,
-          score: bestGroupScore,
-          matched: scores.groups.matches[bestGroup],
-          tech: Object.keys(tech.technologies).filter(t =>
-            scores.groups.matches[bestGroup].some(m => m.word === t)
-          )
-        },
-
-        entry: {
-          score: scores.entry.normalized,
-          positive: scores.entry.matched.filter(p =>
-            Object.keys(entrySignals.positive).includes(p)
-          ),
-          negative: scores.entry.matched.filter(p =>
-            Object.keys(entrySignals.negative).includes(p)
-          )
-        },
-
-        quality: {
-          score: scores.quality.score,
-          redFlags: scores.quality.redFlags
-        }
-      },
-
+      total,
+      breakdown,
+      meta,
       notes
-    },
+    }
   };
 }
 

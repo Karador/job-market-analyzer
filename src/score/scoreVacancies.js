@@ -1,4 +1,8 @@
-const { taskTypes, entrySignals, softPenalties, qualitySignals } = require('./dictionaries');
+const {
+  entrySignals,
+  softPenalties,
+  qualitySignals
+} = require('./dictionaries');
 
 function scoreSoftPenalties(text) {
   let penalty = 0;
@@ -64,66 +68,60 @@ function scoreQuality(text) {
   };
 }
 
-function scoreGroups(text) {
-  const scores = {};
-  const matches = {};
-  let maxScore = 0;
-
-  for (const [group, config] of Object.entries(taskTypes)) {
-    let score = 0;
-    matches[group] = [];
-
-    for (const [word, weight] of Object.entries(config.keywords)) {
-      if (text.includes(word)) {
-        score += weight;
-        matches[group].push({ word, weight });
-      }
-    }
-
-    score *= config.weight;
-    scores[group] = score;
-    if (score > maxScore) maxScore = score;
-  }
-
-  for (const group in scores) {
-    scores[group] = maxScore ? scores[group] / maxScore : 0;
-  }
-
-  return { scores, matches };
-}
-
 function scoreVacancy(vacancy) {
-  const text = vacancy.text;
+  const text = vacancy.text.toLowerCase();
+  const tech = vacancy.tech || {};
+  const meta = tech.meta || {};
 
-  const tech = vacancy.tech;
-
-  const groups = scoreGroups(tech.tags);
-  const entry = scoreEntry(text);
   const quality = scoreQuality(text);
-
-  const maxGroupScore = Math.max(...Object.values(groups.scores));
-
+  const entry = scoreEntry(text);
   const softPenalty = scoreSoftPenalties(text);
 
-  const baseTotal =
-    0.4 * maxGroupScore +
-    0.4 * entry.normalized +
-    0.2 * quality.score;
+  // --- CORE ---
+  const coreProfile = quality.score;
+
+  // --- STACK DIFFERENTIATORS (из аналитики рынка) ---
+  let stackBonus = 0;
+
+  if (meta.hasBackend && tech.technologies?.nodejs) {
+    stackBonus = 0.2;          // frontend + node
+  } else if (meta.hasBackend) {
+    stackBonus = 0.12;         // frontend + backend
+  } else {
+    stackBonus = 0;            // pure frontend
+  }
+
+  // --- ENTRY AS CONTEXT BONUS ---
+  const entryBonus =
+    entry.normalized > 0 ? 0.05 * entry.normalized : 0;
 
   const total = Math.max(
     0,
-    Math.min(1, baseTotal + softPenalty.penalty)
+    Math.min(
+      1,
+      coreProfile +
+        stackBonus +
+        entryBonus +
+        softPenalty.penalty
+    )
   );
 
   return {
     vacancy,
     scores: {
-      groups,
-      entry,
-      quality,
-      softPenalty,
-      baseTotal: Number(baseTotal.toFixed(2)),
-      total: Number(total.toFixed(2))
+      total: total,
+      breakdown: {
+        coreProfile,
+        stackBonus,
+        entryBonus,
+        softPenalty: softPenalty.penalty
+      },
+      meta: {
+        hasBackend: meta.hasBackend,
+        hasNode: Boolean(tech.technologies?.nodejs),
+        entry: entry.normalized > 0,
+        hasRedFlags: quality.redFlags.length > 0
+      }
     }
   };
 }

@@ -20,13 +20,6 @@ function textIncludes(text, words) {
     return words.some(w => t.includes(w));
 }
 
-function bucket(score) {
-    if (score >= 0.5) return 'top';
-    if (score >= 0.3) return 'good';
-    if (score >= 0.2) return 'mid';
-    return 'low';
-}
-
 function inc(map, key, by = 1) {
     map[key] = (map[key] || 0) + by;
 }
@@ -45,7 +38,7 @@ function marketRoleProfile(scoredVacancies) {
     };
 
     for (const v of scoredVacancies) {
-        const b = bucket(v.scores.total) === 'top' ? 'top' : 'other';
+        const b = v.rank === 'top' ? 'top' : 'other';
 
         const tech = v.vacancy.tech?.technologies || {};
         const meta = v.vacancy.tech?.meta || {};

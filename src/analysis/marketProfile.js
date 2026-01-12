@@ -1,10 +1,3 @@
-function bucket(score) {
-    if (score >= 0.5) return 'top';
-    if (score >= 0.3) return 'good';
-    if (score >= 0.2) return 'mid';
-    return 'low';
-}
-
 function inc(map, key, by = 1) {
     map[key] = (map[key] || 0) + by;
 }
@@ -17,7 +10,7 @@ function getBucketed(vacancies) {
     const buckets = { top: [], good: [], mid: [], low: [] };
 
     for (const v of vacancies) {
-        buckets[bucket(v.scores.total)].push(v);
+        buckets[v.rank].push(v);
     }
 
     return buckets;

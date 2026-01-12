@@ -1,5 +1,10 @@
 function penaltyStats(scored) {
-  const values = scored.map(v => v.explain.softPenalty.penalty).sort((a, b) => a - b);
+  const values = scored
+    .map(v => v.scores.breakdown.softPenalty)
+    .filter(v => typeof v === 'number')
+    .sort((a, b) => a - b);
+
+  if (!values.length) return null;
 
   const percentile = p =>
     values[Math.floor(values.length * p)];

@@ -1,10 +1,3 @@
-function bucket(score) {
-  if (score >= 0.5) return 'top';
-  if (score >= 0.3) return 'good';
-  if (score >= 0.2) return 'mid';
-  return 'low';
-}
-
 function inc(map, key, by = 1) {
   map[key] = (map[key] || 0) + by;
 }
@@ -75,7 +68,7 @@ function skillGapFromTopKeywords(scoredVacancies, options = {}) {
   const buckets = { top: [], other: [] };
 
   for (const v of scoredVacancies) {
-    const b = bucket(v.scores.total);
+    const b = v.rank;
     if (b === 'top') buckets.top.push(v);
     else buckets.other.push(v);
   }

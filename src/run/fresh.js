@@ -54,8 +54,7 @@ async function runFresh({
   const candidates = freshScored
     .filter(v =>
       !storedKeys.has(vacancyKey(v)) &&
-      !seen[vacancyKey(v)] &&
-      v.explain.verdict !== 'reject'
+      !seen[vacancyKey(v)]
     )
     .sort((a, b) => b.scores.total - a.scores.total)
     .slice(0, limit);
