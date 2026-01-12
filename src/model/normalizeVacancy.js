@@ -59,6 +59,7 @@ function normalizeHH(raw) {
   const text = [
     title,
     description,
+    v.experience || '',
   ].join('\n');
 
   return {
@@ -84,7 +85,8 @@ function normalizeHabr(raw) {
 
   const text = [
     title,
-    ...(v.skills || [])
+    ...(v.skills || []),
+    v.meta.experience || ''
   ].join('\n');
 
   return {

@@ -52,6 +52,10 @@ function normalizeTechnologies(vacancy) {
     hasReactNative: false,
     hasFrontend: false,
     hasBackend: false,
+    frontendFramework: null,   // 'react' | 'vue' | 'angular'
+    ecosystem: 'unknown',      // 'js' | 'non-js' | 'unknown'
+    isLayoutHeavy: false,
+    isLegacyTooling: false,
   };
 
   // --- PASS 1: direct matches ---
@@ -94,6 +98,11 @@ function normalizeTechnologies(vacancy) {
     }
   }
 
+  if (technologies['react.web']) meta.frontendFramework = 'react';
+  else if (technologies['vue']) meta.frontendFramework = 'vue';
+  else if (technologies['angular']) meta.frontendFramework = 'angular';
+
+
   // --- PASS 2: inferred technologies ---
   if (
     technologies['react.web'] ||
@@ -105,6 +114,35 @@ function normalizeTechnologies(vacancy) {
       technologies['javascript'] = { inferred: true };
       tags.add('javascript');
     }
+  }
+
+  const hasJS =
+    technologies['javascript'] ||
+    technologies['typescript'] ||
+    technologies['nodejs'] ||
+    technologies['react.web'] ||
+    technologies['vue'] ||
+    technologies['angular'];
+
+  const hasExplicitNonJS =
+    ['1c', 'java', 'dotnet', 'php'].some(t =>
+      text.includes(t)
+    );
+
+  if (hasJS) meta.ecosystem = 'js';
+  else if (hasExplicitNonJS) meta.ecosystem = 'non-js';
+  else meta.ecosystem = 'unknown';
+
+  if (
+    includesAny(text, ['верстка', 'верстальщик', 'html', 'css', 'scss']) &&
+    !technologies['react.web'] &&
+    !technologies['typescript']
+  ) {
+    meta.isLayoutHeavy = true;
+  }
+
+  if (includesAny(text, ['gulp', 'pug', 'jquery'])) {
+    meta.isLegacyTooling = true;
   }
 
   return {

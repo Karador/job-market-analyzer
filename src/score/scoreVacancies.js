@@ -63,9 +63,35 @@ function scoreQuality(text) {
   }
 
   return {
-    score: Math.max(0, Math.min(1, score)),
+    score: Math.max(0.4, Math.min(1, score)),
     redFlags
   };
+}
+
+function scoreRelevancePenalty(meta) {
+  let relevancePenalty = 0;
+
+  if (meta.ecosystem === 'non-js') {
+    relevancePenalty -= 0.3;
+  }
+
+  if (meta.frontendFramework === 'vue') {
+    relevancePenalty -= 0.05;
+  }
+
+  if (meta.isLayoutHeavy) {
+    relevancePenalty -= 0.15;
+  }
+
+  if (meta.isLegacyTooling) {
+    relevancePenalty -= 0.15;
+  }
+
+  if (meta.hasBackend && !meta.hasFrontend) {
+    relevancePenalty -= 0.2;
+  }
+
+  return Math.max(relevancePenalty, -0.4);
 }
 
 function scoreVacancy(vacancy) {
@@ -76,44 +102,51 @@ function scoreVacancy(vacancy) {
   const quality = scoreQuality(text);
   const entry = scoreEntry(text);
   const softPenalty = scoreSoftPenalties(text);
+  const relevancePenalty = scoreRelevancePenalty(meta);
 
   // --- CORE ---
-  const coreProfile = quality.score;
+  const coreProfile = quality.score * 0.85;
 
   // --- STACK DIFFERENTIATORS (из аналитики рынка) ---
-  let stackBonus = 0;
+  // let stackBonus = 0;
 
-  if (meta.hasBackend && tech.technologies?.nodejs) {
-    stackBonus = 0.2;          // frontend + node
-  } else if (meta.hasBackend) {
-    stackBonus = 0.12;         // frontend + backend
-  } else {
-    stackBonus = 0;            // pure frontend
-  }
+  const isFrontendRole =
+    meta.hasFrontend ||
+    meta.frontendFramework !== null;
+
+  const isFullstack =
+    meta.hasFrontend && meta.hasBackend;
+
+  // if (isFullstack && tech.technologies?.nodejs) {
+  //   stackBonus = 0.15;   // frontend + node
+  // } else if (isFullstack) {
+  //   stackBonus = 0.08;
+  // } else {               // frontend + backend
+  //   stackBonus = 0;      // pure frontend
+  // }
 
   // --- ENTRY AS CONTEXT BONUS ---
-  const entryBonus =
-    entry.normalized > 0 ? 0.05 * entry.normalized : 0;
+  const entryMultiplier =
+    entry.normalized > 0 ? 1 + 0.1 * entry.normalized : 1;
+
+  const base = coreProfile +
+    // stackBonus +
+    relevancePenalty +
+    softPenalty.penalty
 
   const total = Math.max(
     0,
-    Math.min(
-      1,
-      coreProfile +
-        stackBonus +
-        entryBonus +
-        softPenalty.penalty
-    )
+    Math.min(1, base * entryMultiplier)
   );
 
   return {
     vacancy,
     scores: {
-      total: total,
+      total: Number(total.toFixed(2)),
       breakdown: {
         coreProfile,
-        stackBonus,
-        entryBonus,
+        // stackBonus,
+        entryMultiplier,
         softPenalty: softPenalty.penalty
       },
       meta: {

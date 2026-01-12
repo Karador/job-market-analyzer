@@ -45,8 +45,8 @@ function isMeaningfulKeyword(kw) {
 
 const TECH_ALIASES = {
   'js': 'javascript',
-  'node': 'node.js',
-  'nodejs': 'node.js',
+  'node': 'nodejs',
+  'node.js': 'nodejs',
   'reactjs': 'react',
   'react.js': 'react',
   'vuejs': 'vue',

@@ -17,15 +17,13 @@ const entrySignals = {
 
 const softPenalties = {
   experienceMismatch: {
-    phrases: [
-      'middle',
-      'middle+',
-      'senior',
-      'lead',
-      '3+',
-      '5+'
-    ],
+    phrases: ['senior', 'lead', '5+'],
     penalty: -0.35
+  },
+
+  experienceStretch: {
+    phrases: ['middle', 'middle+', '3+'],
+    penalty: -0.15
   },
 
   unclearSalary: {
