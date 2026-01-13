@@ -71,11 +71,19 @@ function scoreQuality(text) {
 function scoreRelevancePenalty(meta) {
   let relevancePenalty = 0;
 
+  if (meta.intentConfidence === 'medium') {
+    relevancePenalty -= 0.05;
+  }
+
+  if (meta.intentConfidence === 'low') {
+    relevancePenalty -= 0.1;
+  }
+
   if (meta.ecosystem === 'non-js') {
     relevancePenalty -= 0.3;
   }
 
-  if (meta.frontendFramework === 'vue') {
+  if (meta.frontendFramework === 'vue' || meta.frontendFramework === 'angular') {
     relevancePenalty -= 0.05;
   }
 

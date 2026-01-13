@@ -1,92 +1,58 @@
-const mustHaveVariants = [
-  "react", "vue", "angular",
-  "frontend", "web",
-  "javascript", "js",
-  "фронтенд", "фронт", "web-разработчик"
-];
-
-const strongPlus = ["typescript", "node", "next.js"];
-const hardReject = ["1c", "bitrix", "support", "assistant", "manager"];
-const backendRejectConditional = ["php"]; // reject если backend-heavy
-
-const frontendKeywords = ["react", "vue", "angular", "html", "css", "js", "typescript", "next"];
-const backendKeywords = ["php", "node", "java", "python", "ruby", "spring", "django", "1c"];
-
-// Проверка соотношения фронт/бек
-function isFrontendHeavy(keywords) {
-  const frontendHits = keywords.filter(k => frontendKeywords.includes(k)).length;
-  const backendHits = keywords.filter(k => backendKeywords.includes(k)).length;
-  const ratio = frontendHits / Math.max(frontendHits + backendHits, 1);
-  return ratio >= 0.6;
-}
-
-// hard reject
-function hasHardReject(keywords) {
-  return hardReject.some(h => keywords.includes(h));
-}
-
-// Условный reject (PHP + backend-heavy)
-function hasConditionalReject(keywords, frontendHeavy) {
-  return backendRejectConditional.some(h => keywords.includes(h) && !frontendHeavy);
-}
-
-// Функция расширенного mustHave
-function hasMustHaveEnhanced(keywords) {
-  const text = keywords.join(' ');
-
-  // 1. Прямой match синонимов
-  if (mustHaveVariants.some(m => keywords.includes(m))) {
-    return true;
-  }
-
-  // 2. Комбинации слов
-  if (/frontend.*javascript|javascript.*frontend|web.*developer|developer.*web/i.test(text)) {
-    return true;
-  }
-
-  // 3. Если есть strongPlus
-  if (strongPlus.some(k => keywords.includes(k))) {
-    return true;
-  }
-
-  return false;
-}
-
-// Gate
 function gateVacancy(vacancy) {
-  const textKeywords = vacancy.text.toLowerCase().split(/[\s\-\.]+/); // пробел, дефис, точка
-  const skillKeywords = (vacancy.skills ?? []).map(s => s.toLowerCase());
+  const { tech, text } = vacancy;
+  const meta = tech?.meta ?? {};
+  const technologies = tech?.technologies ?? {};
 
-  const keywords = [...textKeywords, ...skillKeywords];
-
-  const frontendHeavy = isFrontendHeavy(keywords);
-  const reasons = [];
-
-  // Must-have
-  if (!hasMustHaveEnhanced(keywords)) {
-    reasons.push({ type: "reject", code: "missing_must_have" });
+  // --- HARD REJECT: РОЛЬ НЕ ФРОНТ / НЕ ВЕБ ---
+  if (
+    text.includes('1c') ||
+    text.includes('1с') ||
+    text.includes('битрикс') ||
+    text.includes('bitrix') ||
+    text.includes('support') ||
+    text.includes('manager') ||
+    text.includes('дизайнер')
+  ) {
+    return { pass: false, reason: 'hard_reject' };
   }
 
-  // Hard reject
-  if (hasHardReject(keywords)) {
-    reasons.push({ type: "reject", code: "hard_reject" });
+  const hasFrontendSignal =
+    meta.hasFrontend ||
+    text.includes('frontend') ||
+    text.includes('front') ||
+    text.includes('web');
+
+  const hasJsSignal =
+    technologies.javascript ||
+    technologies.typescript;
+
+  const hasBackendOnly =
+    meta.hasBackend &&
+    !hasFrontendSignal;
+
+  // --- BACKEND ONLY ---
+  if (hasBackendOnly) {
+    return { pass: false, reason: 'backend_only' };
   }
 
-  // Conditional backend reject
-  if (hasConditionalReject(keywords, frontendHeavy)) {
-    reasons.push({ type: "reject", code: "backend_php" });
+  // --- НЕТ НИ WEB, НИ JS ---
+  if (!hasFrontendSignal && !hasJsSignal) {
+    return { pass: false, reason: 'no_frontend_signal' };
   }
 
-  // Пропуск
-  const pass = reasons.every(r => r.type !== "reject") || reasons.length === 0;
+  // --- DOTNET BACKEND ---
+  if (technologies.dotnet && !hasFrontendSignal) {
+    return { pass: false, reason: 'dotnet_backend' };
+  }
 
+  // ВСЁ ОСТАЛЬНОЕ ПРОПУСКАЕМ
   return {
-    pass,
-    reasons,
-    frontendHeavy,
-    strongPlusFound: strongPlus.filter(k => keywords.includes(k)),
-    keywords,
+    pass: true,
+    metaPatch: {
+      hasFrontendSignal,
+      hasJsSignal
+    }
   };
 }
 
-module.exports = gateVacancy;
+module.exports = { gateVacancy };

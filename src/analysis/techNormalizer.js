@@ -56,6 +56,7 @@ function normalizeTechnologies(vacancy) {
     ecosystem: 'unknown',      // 'js' | 'non-js' | 'unknown'
     isLayoutHeavy: false,
     isLegacyTooling: false,
+    intentConfidence: 'low',
   };
 
   // --- PASS 1: direct matches ---
@@ -144,6 +145,13 @@ function normalizeTechnologies(vacancy) {
   if (includesAny(text, ['gulp', 'pug', 'jquery'])) {
     meta.isLegacyTooling = true;
   }
+
+  meta.intentConfidence =
+    meta.hasFrontend && meta.frontendFramework
+      ? 'high'
+      : meta.hasFrontend
+        ? 'medium'
+        : 'low';
 
   return {
     ...vacancy,
