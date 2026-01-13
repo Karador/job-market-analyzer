@@ -3,7 +3,7 @@ function inc(map, key, by = 1) {
 }
 
 function hasTech(v, tech) {
-    return Boolean(v.vacancy.tech?.technologies?.[tech]);
+    return v.vacancy.tech?.tags?.includes(tech);
 }
 
 function getBucketed(vacancies) {
@@ -60,26 +60,7 @@ function marketProfile(scoredVacancies) {
     const stackShapes = {};
 
     for (const v of scoredVacancies) {
-        const meta = v.vacancy.tech?.meta || {};
-        const technologies = v.vacancy.tech?.technologies || {};
-
-        let shape = 'unknown';
-
-        const hasFrontend = meta.hasFrontend ||
-            technologies['react.web'] ||
-            technologies['vue'] ||
-            technologies['angular'];
-
-        if (meta.hasReactNative && hasFrontend) {
-            shape = 'mobile-mixed';
-        } else if (meta.hasReactNative) {
-            shape = 'mobile-only';
-        } else if (hasFrontend && meta.hasBackend) {
-            shape = 'frontend+backend';
-        } else if (hasFrontend) {
-            shape = 'frontend-only';
-        }
-
+        const shape = v.vacancy.tech?.meta?.stackShape ?? 'unknown';
         inc(stackShapes, shape);
     }
 
@@ -99,11 +80,6 @@ function marketProfile(scoredVacancies) {
         const technologies = v.vacancy.tech?.technologies || {};
         const hasRN = meta.hasReactNative;
 
-        const hasFrontend = meta.hasFrontend ||
-            technologies['react.web'] ||
-            technologies['vue'] ||
-            technologies['angular'];
-
         if (!hasRN) {
             rn.score.none.push(v.scores.total);
             continue;
@@ -111,7 +87,7 @@ function marketProfile(scoredVacancies) {
 
         rn.total++;
 
-        if (hasFrontend) {
+        if (meta.hasFrontend) {
             rn.mixed++;
             rn.score.mixed.push(v.scores.total);
         } else {

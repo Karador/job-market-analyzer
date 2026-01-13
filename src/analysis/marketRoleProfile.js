@@ -44,29 +44,14 @@ function marketRoleProfile(scoredVacancies) {
         const meta = v.vacancy.tech?.meta || {};
         const text = v.vacancy.text || '';
 
-        const roleBackend =
-            meta.hasBackend ||
-            tech['nodejs'] ||
-            textIncludes(text, ROLE_HINTS.backend);
-
         const roleFullstack =
             textIncludes(text, ROLE_HINTS.fullstack);
 
-        const isFrontend =
-            meta.hasFrontend ||
-            tech['react.web'] ||
-            tech['vue'] ||
-            tech['angular'];
+        if (!meta.hasFrontend) continue;
 
-        if (!isFrontend) continue;
-
-        const hasBackend =
-            meta.hasBackend ||
-            tech['nodejs'];
-
-        if (hasBackend && tech['nodejs']) {
+        if (meta.hasBackend && tech['nodejs']) {
             inc(byBucket[b], 'frontendPlusNode');
-        } else if (hasBackend || roleFullstack || roleBackend) {
+        } else if (meta.hasBackend || roleFullstack) {
             inc(byBucket[b], 'frontendPlusBackend');
         } else {
             inc(byBucket[b], 'pureFrontend');
@@ -88,10 +73,6 @@ function marketRoleProfile(scoredVacancies) {
     return {
         top: normalize(byBucket.top),
         other: normalize(byBucket.other),
-        insight: [
-            'Top frontend вакансии значительно чаще ожидают backend или Node.js компетенции',
-            'Pure frontend роль редко соответствует top-вакансиям'
-        ]
     };
 }
 

@@ -1,5 +1,4 @@
 const { loadVacancies } = require('../storage/vacancies.storage');
-const { analyzePenalties } = require('../analysis/analyzePenalties');
 const { scoreStats } = require('../analysis/scoreStats');
 const { penaltyStats } = require('../analysis/penaltyStats');
 const { marketProfile } = require('../analysis/marketProfile');
@@ -11,7 +10,6 @@ async function runAnalyze() {
 
     console.log("stats: ", scoreStats(scoredVacancies));
     console.log("penalties: ", penaltyStats(scoredVacancies));
-    console.log("analyze penalties ", analyzePenalties(scoredVacancies));
     console.dir(marketProfile(scoredVacancies), { depth: null });
     console.dir(skillGapFromTopKeywords(scoredVacancies), { depth: null });
     console.dir(marketRoleProfile(scoredVacancies), { depth: null });

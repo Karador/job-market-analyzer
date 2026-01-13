@@ -71,6 +71,10 @@ function scoreQuality(text) {
 function scoreRelevancePenalty(meta) {
   let relevancePenalty = 0;
 
+  if (meta.stackShape === 'frontend-only-weak') {
+    relevancePenalty -= 0.05;
+  }
+
   if (meta.intentConfidence === 'medium') {
     relevancePenalty -= 0.05;
   }

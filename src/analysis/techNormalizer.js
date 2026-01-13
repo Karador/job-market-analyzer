@@ -68,8 +68,8 @@ function normalizeTechnologies(vacancy) {
     if (rule.canonical === "react" && rule.subtypes) {
       const nativeMatched = rule.subtypes.native.match.filter(k => text.includes(k));
       const webMatched =
-        rule.subtypes.web.match.filter(k => text.includes(k)) &&
-        !rule.subtypes.web.excludeIf.some(k => text.includes(k));
+        !rule.subtypes.web.excludeIf.some(k => text.includes(k)) &&
+        rule.subtypes.web.match.filter(k => text.includes(k));
 
       if (nativeMatched.length) {
         technologies['react.native'] = { matched: nativeMatched };
@@ -146,13 +146,14 @@ function normalizeTechnologies(vacancy) {
     meta.isLegacyTooling = true;
   }
 
-  meta.intentConfidence =
-    meta.hasFrontend && meta.frontendFramework
-      ? 'high'
-      : meta.hasFrontend
-        ? 'medium'
-        : 'low';
-
+  if (meta.hasFrontend && meta.frontendFramework) {
+    meta.intentConfidence = 'high';
+  } else if (meta.hasFrontend && hasJS) {
+    meta.intentConfidence = 'medium';
+  } else if (meta.hasFrontend) {
+    meta.intentConfidence = 'low';
+  }
+  
   return {
     ...vacancy,
     tech: {
