@@ -23,8 +23,6 @@ async function runTop({ limit } = { limit: 5 }) {
             v.vacancy.title,
             '\n',
             v.vacancy.meta.link,
-            '\n',
-            v.explain,
         );
     });
 }

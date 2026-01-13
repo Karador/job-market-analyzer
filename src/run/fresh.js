@@ -76,7 +76,6 @@ async function runFresh({
       v.vacancy.title,
       '\n',
       v.vacancy.meta.link,
-      '\n',
     );
   });
 }

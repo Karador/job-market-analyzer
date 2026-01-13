@@ -37,6 +37,46 @@ const TECH_RULES = {
     canonical: "angular",
     match: ["angular"],
   },
+
+  java: {
+    canonical: "java",
+    match: ["java"],
+  },
+
+  dotnet: {
+    canonical: "dotnet",
+    match: [".net", "c#"]
+  },
+
+  php: {
+    canonical: "php",
+    match: ["php"],
+  }
+};
+
+const TITLE_ROLE_HINTS = {
+  frontend: [
+    'web',
+    'front',
+    'веб',
+    'фронт',
+  ],
+  backend: [
+    'backend',
+  ],
+}
+
+const ROLE_HINTS = {
+  backend: [
+    'server',
+    'микросервис',
+    'микросервисы'
+  ],
+  fullstack: [
+    'fullstack',
+    'full-stack',
+    'end-to-end'
+  ]
 };
 
 function includesAny(text, phrases = []) {
@@ -44,6 +84,7 @@ function includesAny(text, phrases = []) {
 }
 
 function normalizeTechnologies(vacancy) {
+  const title = vacancy.title.toLowerCase();
   const text = vacancy.text.toLowerCase();
 
   const technologies = {};
@@ -51,13 +92,20 @@ function normalizeTechnologies(vacancy) {
   const meta = {
     hasReactNative: false,
     hasFrontend: false,
+    hasFrontendIntent: false,
     hasBackend: false,
+    hasBackendIntent: false,
+    hasFullStackIntent: false,
     frontendFramework: null,   // 'react' | 'vue' | 'angular'
     ecosystem: 'unknown',      // 'js' | 'non-js' | 'unknown'
     isLayoutHeavy: false,
     isLegacyTooling: false,
     intentConfidence: 'low',
   };
+
+  meta.hasFrontendIntent = includesAny(title, TITLE_ROLE_HINTS.frontend);
+  meta.hasBackendIntent = includesAny(title, TITLE_ROLE_HINTS.backend) || includesAny(text, ROLE_HINTS.backend);
+  meta.hasFullStackIntent = includesAny(text, ROLE_HINTS.fullstack);
 
   // --- PASS 1: direct matches ---
   for (const rule of Object.values(TECH_RULES)) {
@@ -146,14 +194,22 @@ function normalizeTechnologies(vacancy) {
     meta.isLegacyTooling = true;
   }
 
-  if (meta.hasFrontend && meta.frontendFramework) {
+  const sources = {
+    framework: Boolean(meta.frontendFramework),
+    jsStack: technologies['javascript'] || technologies['typescript'],
+    intentText: meta.hasFrontendIntent || meta.hasFullStackIntent
+  };
+
+  const sourceCount = Object.values(sources).filter(Boolean).length;
+
+  if (sourceCount >= 2) {
     meta.intentConfidence = 'high';
-  } else if (meta.hasFrontend && hasJS) {
+  } else if (sourceCount === 1) {
     meta.intentConfidence = 'medium';
   } else if (meta.hasFrontend) {
     meta.intentConfidence = 'low';
   }
-  
+
   return {
     ...vacancy,
     tech: {

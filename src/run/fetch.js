@@ -5,7 +5,7 @@ const { saveVacancies } = require('../storage/vacancies.storage');
 const { processRaw } = require('../model/processVacancies');
 
 function getFetchDelay() {
-  return process.env.NODE_ENV === 'production' ? 3000 : 0;
+  return process.env.NODE_ENV === 'production' ? 2000 : 0;
 }
 
 async function runFetch() {
@@ -18,7 +18,7 @@ async function runFetch() {
   ] = await Promise.all([
     getRemoteVacancies({ delay }),
     getHabrVacancies({ delay }),
-    getHHVacancies({ delay: 3000 }),
+    getHHVacancies({ delay: 2000 }),
   ]);
 
   const raw = [

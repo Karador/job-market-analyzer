@@ -100,7 +100,7 @@ async function loadVacanciesPage(page) {
 /**
  * Загрузка первых N страниц
  */
-async function getFreshVacancies({ pages = 1, delay = 3000 } = {}) {
+async function getFreshVacancies({ pages = 1, delay = 2000 } = {}) {
     const result = [];
 
     for (let page = 0; page < pages; page++) {
@@ -120,7 +120,7 @@ async function getFreshVacancies({ pages = 1, delay = 3000 } = {}) {
 /**
  * Загрузка всех страниц
  */
-async function getAllVacancies({ delay = 3000 } = {}) {
+async function getAllVacancies({ delay = 2000 } = {}) {
     const lastPage = await getLastPage();
     if (lastPage === null) return [];
 

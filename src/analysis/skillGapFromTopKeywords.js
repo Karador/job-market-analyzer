@@ -21,7 +21,9 @@ const ROLE_NOISE = new Set([
   'full-stack',
   'middle',
   'senior',
-  'junior'
+  'junior',
+  'git',
+  'api',
 ]);
 
 const STOP_WORDS = new Set([
@@ -47,8 +49,9 @@ const TECH_ALIASES = {
   'js': 'javascript',
   'node': 'nodejs',
   'node.js': 'nodejs',
-  'reactjs': 'react',
-  'react.js': 'react',
+  'reactjs': 'react.web',
+  'react.js': 'react.web',
+  'react': 'react.web',
   'vuejs': 'vue',
   'vue.js': 'vue',
   'ts': 'typescript',
@@ -78,15 +81,17 @@ function skillGapFromTopKeywords(scoredVacancies, options = {}) {
 
   function collect(vacancies, target) {
     for (const v of vacancies) {
+      const tech = v.vacancy.tech?.technologies || {};
       const text = v.vacancy.text || '';
 
       for (let kw of extractKeywords(text)) {
         if (!isMeaningfulKeyword(kw)) continue;
         kw = normalizeKeyword(kw);
-        inc(target, kw);
+        if (!tech[kw]) {
+          inc(target, kw);
+        }
       }
 
-      const tech = v.vacancy.tech?.technologies || {};
       for (const key of Object.keys(tech)) {
         inc(target, key);
       }
