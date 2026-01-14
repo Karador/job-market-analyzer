@@ -41,6 +41,7 @@ const TECH_RULES = {
   java: {
     canonical: "java",
     match: ["java"],
+    excludeIf: ["javascript"],
   },
 
   dotnet: {
@@ -110,7 +111,7 @@ function normalizeTechnologies(vacancy) {
   // --- PASS 1: direct matches ---
   for (const rule of Object.values(TECH_RULES)) {
     const matched = rule.match.filter(k => text.includes(k));
-    if (!matched.length) continue;
+    if (!matched.length || includesAny(text, rule?.excludeIf)) continue;
 
     // React with subtypes
     if (rule.canonical === "react" && rule.subtypes) {

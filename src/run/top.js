@@ -7,7 +7,7 @@ async function runTop({ limit } = { limit: 5 }) {
     const seen = loadSeen();
 
     const top = vacancies
-        .filter(v => v.rank !== 'low' && !seen[vacancyKey(v)])
+        .filter(v => !seen[vacancyKey(v)])
         .sort((a, b) => b.scores.total - a.scores.total)
         .slice(0, limit);
 
