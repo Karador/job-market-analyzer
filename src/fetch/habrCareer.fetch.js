@@ -179,7 +179,7 @@ module.exports = {
  */
 if (require.main === module) {
   (async () => {
-    const res = await getAllVacancies({ page: 1 });
-    console.log(res.length);
+    const res = await getAllVacancies({ pages: 1 });
+    console.log(res.length, res.slice(0, 2));
   })();
 }

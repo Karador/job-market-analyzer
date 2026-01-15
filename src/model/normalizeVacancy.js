@@ -54,7 +54,7 @@ function normalizeHH(raw) {
   const v = raw;
 
   const title = cleanText(v.title);
-  const description = cleanText(v.description);
+  const description = cleanText(v.snippetReq + v.snippetResp + v.snippetCond + v.snippetSkills);
 
   const text = [
     title,
@@ -67,13 +67,13 @@ function normalizeHH(raw) {
     title,
     company: cleanText(v.company),
     text,
-    salary: { from: null, to: null, currency: null },
+    salary: v.compensation,
 
     meta: {
       source: 'hh',
       link: v.link,
       experience: v.experience || null,
-      remote: v.isRemote,
+      remote: v.workSchedule === 'remote',
     }
   };
 }

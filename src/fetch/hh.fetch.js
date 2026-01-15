@@ -30,6 +30,72 @@ async function getLastPage() {
     return Math.min(Math.ceil(pages ? pages / 50 : 0), 39);
 }
 
+function extractInitialState($) {
+    const raw =
+        $('#HH-Lux-InitialState').text().trim() ||
+        $('template#HH-Lux-InitialState').text().trim();
+
+    if (!raw) return null;
+
+    try {
+        return JSON.parse(raw);
+    } catch {
+        return null;
+    }
+}
+
+function normalizeCompensation(comp) {
+  if (!comp || comp.noCompensation) return null;
+
+  const from = Number.isFinite(comp.from) ? comp.from : null;
+  const to = Number.isFinite(comp.to) ? comp.to : null;
+
+  const currency = comp.currencyCode || null;
+
+  const gross = typeof comp.gross === 'boolean' ? comp.gross : null;
+
+  const period = comp.mode || null;
+
+  const frequency = comp.frequency || null;
+
+  return { from, to, currency, gross, period, frequency };
+}
+
+function mapVacancy(v) {
+  return {
+    id: v.vacancyId,
+    source: 'hh',
+    title: v.name || '',
+    link: v?.links?.desktop || null,
+
+    company: v?.company?.visibleName || v?.company?.name || '',
+    trustedEmployer: Boolean(v?.company?.['@trusted']),
+    employerRating: v?.company?.employerReviews?.totalRating
+      ? Number(v.company.employerReviews.totalRating)
+      : null,
+    employerReviewsCount: v?.company?.employerReviews?.reviewsCount ?? null,
+
+    area: v?.area?.name || null,
+    address: v?.address?.displayName || null,
+
+    experience: v?.workExperience || '',
+    workSchedule: v?.['@workSchedule'] || null,
+
+    snippetReq: v?.snippet?.req || '',
+    snippetResp: v?.snippet?.resp || '',
+    snippetCond: v?.snippet?.cond || '',
+    snippetSkills: v?.snippet?.skill || '',
+
+    compensation: normalizeCompensation(v?.compensation),
+
+    responsesCount: v?.responsesCount ?? null,
+    onlineUsersCount: v?.online_users_count ?? null,
+
+    publishedAt: v?.publicationTime?.$ || null,
+    premium: Boolean(v?.vacancyProperties?.calculatedStates?.HH?.premium),
+  };
+}
+
 /**
  * Парсинг одной страницы вакансий
  */
@@ -38,42 +104,10 @@ async function getVacancies(path) {
     if (!html) return null;
 
     const $ = cheerio.load(html);
-    const vacancies = [];
 
-    $('[data-qa="vacancy-serp__vacancy"]').each((_, el) => {
-        const title = $(el).find('[data-qa="serp-item__title-text"]').first().text();
-        const description = $(el).find('[data-qa="vacancy-serp__vacancy_snippet_responsibility"]').text()
-            + ' ' + $(el).find('[data-qa="vacancy-serp__vacancy_snippet_requirement"]').text()
-            + ' ' + $(el).find('[data-qa^="vacancy-serp__vacancy-compensation"]').first().text()
-            + ' ' + $(el).find('[data-qa="vacancy-serp__vacancy-compensation-frequency-MONTHLY"]').first().text()
-            + ' ' + $(el).find('[data-qa="vacancy-label-side-job"]').first().text();
-        const link = $(el).find('[data-qa="serp-item__title"]').first().attr('href');
-        const company = $(el).find('[data-qa="vacancy-serp__vacancy-employer-text"]').first().text();
-        const isRemote = Boolean($(el).find('[data-qa="vacancy-label-work-schedule-remote"]').length);
-        const experience = $(el).find('[data-qa^="vacancy-serp__vacancy-work-experience-noExperience"]').first().text()
-           || $(el).find('[data-qa="vacancy-serp__vacancy-work-experience-between3And6"]').first().text()
-           || $(el).find('[data-qa="vacancy-serp__vacancy-work-experience-between1And3"]').first().text();
+    const vacanciesRaw = extractInitialState($).vacancySearchResult.vacancies
 
-        const idMatch = link.match(/\/vacancy\/(\d+)/);
-        const id = idMatch ? idMatch[1] : null;
-
-        if (!title || !id) {
-            return
-        };
-
-        vacancies.push({
-            id,
-            source: 'hh',
-            title,
-            description,
-            company,
-            isRemote,
-            experience,
-            link: link.startsWith('http') ? link : BASE_URL + link,
-        });
-    });
-
-    return vacancies;
+    return vacanciesRaw.filter(v => v.vacancyId && v?.links?.desktop).map(mapVacancy)
 }
 
 /**
@@ -140,7 +174,7 @@ module.exports = {
  */
 if (require.main === module) {
     (async () => {
-        const res = await getAllVacancies({ page: 1 });
-        console.log(res.length, res.slice(0, 5));
+        const res = await getFreshVacancies({ pages: 1 });
+        console.log(res.length, res.slice(0, 2));
     })();
 }

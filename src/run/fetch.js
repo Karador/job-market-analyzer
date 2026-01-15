@@ -29,6 +29,14 @@ async function runFetch() {
 
   const processed = processRaw(raw);
 
+  const bySource = processed.reduce((acc, v) => {
+    const s = v.vacancy.meta.source;
+    acc[s] = (acc[s] || 0) + 1;
+    return acc;
+  }, {});
+
+  console.log('Fetched:', bySource);
+
   const saved = await saveVacancies(processed);
   console.log(`Сохранено новых вакансий: ${saved}`);
 }

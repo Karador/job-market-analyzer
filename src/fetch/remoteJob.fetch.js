@@ -94,3 +94,10 @@ async function getAllVacancies({ delay = 0 } = {}) {
 }
 
 module.exports = { getFreshVacancies, getAllVacancies };
+
+if (require.main === module) {
+  (async () => {
+    const res = await getFreshVacancies({ pages: 1 });
+    console.log(res.length, res.slice(0, 2));
+  })();
+}
