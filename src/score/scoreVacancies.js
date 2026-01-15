@@ -119,30 +119,11 @@ function scoreVacancy(vacancy) {
   // --- CORE ---
   const coreProfile = quality.score * 0.85;
 
-  // --- STACK DIFFERENTIATORS (из аналитики рынка) ---
-  // let stackBonus = 0;
-
-  const isFrontendRole =
-    meta.hasFrontend ||
-    meta.frontendFramework !== null;
-
-  const isFullstack =
-    meta.hasFrontend && meta.hasBackend;
-
-  // if (isFullstack && tech.technologies?.nodejs) {
-  //   stackBonus = 0.15;   // frontend + node
-  // } else if (isFullstack) {
-  //   stackBonus = 0.08;
-  // } else {               // frontend + backend
-  //   stackBonus = 0;      // pure frontend
-  // }
-
   // --- ENTRY AS CONTEXT BONUS ---
   const entryMultiplier =
     entry.normalized > 0 ? 1 + 0.1 * entry.normalized : 1;
 
   const base = coreProfile +
-    // stackBonus +
     relevancePenalty +
     softPenalty.penalty
 
@@ -157,7 +138,6 @@ function scoreVacancy(vacancy) {
       total: Number(total.toFixed(2)),
       breakdown: {
         coreProfile,
-        // stackBonus,
         entryMultiplier,
         softPenalty: softPenalty.penalty
       },

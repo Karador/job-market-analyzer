@@ -24,6 +24,8 @@ const ROLE_NOISE = new Set([
   'junior',
   'git',
   'api',
+  'between1and3',
+  'between3and6',
 ]);
 
 const STOP_WORDS = new Set([
