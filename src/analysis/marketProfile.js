@@ -77,7 +77,6 @@ function marketProfile(scoredVacancies) {
 
     for (const v of scoredVacancies) {
         const meta = v.vacancy.tech?.meta || {};
-        const technologies = v.vacancy.tech?.technologies || {};
         const hasRN = meta.hasReactNative;
 
         if (!hasRN) {
@@ -96,34 +95,10 @@ function marketProfile(scoredVacancies) {
         }
     }
 
-    function avg(list) {
-        return list.length
-            ? Number((list.reduce((a, b) => a + b, 0) / list.length).toFixed(2))
-            : 0;
-    }
-
-    const reactNative = {
-        presence: Number((rn.total / scoredVacancies.length).toFixed(2)),
-        pureShare: rn.total ? Number((rn.pure / rn.total).toFixed(2)) : 0,
-        mixedShare: rn.total ? Number((rn.mixed / rn.total).toFixed(2)) : 0,
-        avgScore: {
-            pure: avg(rn.score.pure),
-            mixed: avg(rn.score.mixed),
-            none: avg(rn.score.none)
-        }
-    };
-
     const notes = [];
 
-    if (techShareByBucket.top.react > 0.7) {
+    if (techShareByBucket.top['react.web'] > 0.7) {
         notes.push('React доминирует в top-вакансиях');
-    }
-
-    if (
-        reactNative.avgScore.pure < reactNative.avgScore.none &&
-        reactNative.pureShare > 0
-    ) {
-        notes.push('Чистый React Native значительно снижает средний score');
     }
 
     if (stackShapes['frontend+backend'] > stackShapes['frontend-only']) {
@@ -134,7 +109,6 @@ function marketProfile(scoredVacancies) {
         coverage,
         techShare: techShareByBucket,
         stackShapes,
-        reactNative,
         notes
     };
 }
