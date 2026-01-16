@@ -5,6 +5,7 @@ module.exports = {
   root: ROOT,
   src: path.join(ROOT, 'src'),
   data: path.join(ROOT, 'data'),
+  logs: path.join(ROOT, 'logs'),
 
   vacancies: path.join(ROOT, 'data', 'vacancies.jsonl'),
   seen: path.join(ROOT, 'data', 'seen.json'),

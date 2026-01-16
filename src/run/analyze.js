@@ -1,3 +1,5 @@
+const fs = require('fs');
+const paths = require('../config/paths');
 const { loadVacancies } = require('../storage/vacancies.storage');
 const { scoreStats } = require('../analysis/scoreStats');
 const { penaltyStats } = require('../analysis/penaltyStats');
@@ -11,6 +13,7 @@ const {
     metaSignalsByRank,
     metaSignalCooccurrence,
 } = require('../analysis/vacancyMetaStats');
+const { collectAnalysisLog } = require('../analysis/collectAnalysisLog');
 
 const ANALYZE_PROFILES = {
     brief: [
@@ -47,6 +50,17 @@ const analyzers = {
 
 async function runAnalyze(profile = 'market') {
     const scoredVacancies = await loadVacancies();
+
+    // Сбор лога
+    const logData = collectAnalysisLog(scoredVacancies);
+
+    // Сохраняем в файл
+    fs.writeFileSync(
+        `${paths.logs}/analysis_${Date.now()}.json`,
+        JSON.stringify(logData, null, 2)
+    );
+
+    console.log(`Analysis log saved: logs/analysis_${Date.now()}.json`);
 
     if (!ANALYZE_PROFILES[profile]) {
         console.warn(`Unknown analyze profile: ${profile}, fallback to market`);
