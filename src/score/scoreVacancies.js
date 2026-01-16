@@ -179,7 +179,8 @@ function scoreVacancy(vacancy) {
       breakdown: {
         coreProfile,
         entryMultiplier,
-        softPenalty: softPenalty.penalty
+        softPenalty: softPenalty.penalty,
+        metaContext,
       },
       meta: {
         hasBackend: meta.hasBackend,
