@@ -68,12 +68,23 @@ function normalizeHH(raw) {
     company: cleanText(v.company),
     text,
     salary: v.compensation,
+    skills: v.snippetSkills.split(', '),
 
     meta: {
       source: 'hh',
       link: v.link,
       experience: v.experience || null,
       remote: v.workSchedule === 'remote',
+      trustedEmployer: v.trustedEmployer,
+      companyRating: v.employerRating,
+      employerReviewsCount: v.employerReviewsCount,
+      area: v.area,
+      address: v.address,
+      workSchedule: v.workSchedule,
+      responsesCount: v.responsesCount,
+      onlineUsersCount: v.onlineUsersCount,
+      date: v.publishedAt,
+      premium: v.premium,
     }
   };
 }
