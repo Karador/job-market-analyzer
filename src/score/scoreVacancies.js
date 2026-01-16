@@ -106,6 +106,44 @@ function scoreRelevancePenalty(meta) {
   return Math.max(relevancePenalty, -0.4);
 }
 
+function scoreMetaContext(vacancy) {
+  let delta = 0;
+  const signals = [];
+
+  const { meta, salary } = vacancy;
+
+  // --- COMPANY RATING ---
+  const rating = meta?.companyRating;
+  const reviews = meta?.employerReviewsCount;
+
+  if (rating >= 4.5) { delta += 0.08; signals.push('rating-4.5+'); }
+  else if (rating >= 4.0) { delta += 0.05; signals.push('rating-4+'); }
+  else if (rating > 0 && rating < 3.0) { delta -= 0.1; signals.push('rating-low'); }
+
+  if (rating >= 4 && reviews >= 50) {
+    delta += 0.03;
+    signals.push('rating-trusted');
+  }
+
+  // --- SALARY ---
+  if (!salary || !salary.from) {
+    delta -= 0.05;
+    signals.push('no-salary');
+  }
+
+  // --- EXPERIENCE + STACK ---
+  if ((meta?.experience === 'between1And3' || meta?.experience === 'Middle') && vacancy.tech.meta.frontendFramework === 'react') {
+    delta += 0.08;
+    signals.push('react-1-3');
+  }
+
+  return {
+    delta: Math.max(-0.2, Math.min(0.2, delta)),
+    signals
+  };
+}
+
+
 function scoreVacancy(vacancy) {
   const text = vacancy.text.toLowerCase();
   const tech = vacancy.tech || {};
@@ -115,6 +153,7 @@ function scoreVacancy(vacancy) {
   const entry = scoreEntry(text);
   const softPenalty = scoreSoftPenalties(text);
   const relevancePenalty = scoreRelevancePenalty(meta);
+  const metaContext = scoreMetaContext(vacancy);
 
   // --- CORE ---
   const coreProfile = quality.score * 0.85;
@@ -125,7 +164,8 @@ function scoreVacancy(vacancy) {
 
   const base = coreProfile +
     relevancePenalty +
-    softPenalty.penalty
+    softPenalty.penalty +
+    metaContext.delta;
 
   const total = Math.max(
     0,

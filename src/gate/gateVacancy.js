@@ -1,5 +1,6 @@
 function gateVacancy(vacancy) {
-  const { tech, text } = vacancy;
+  const tech = vacancy.tech;
+  const text = vacancy.text.toLowerCase();
   const meta = tech?.meta ?? {};
   const technologies = tech?.technologies ?? {};
 

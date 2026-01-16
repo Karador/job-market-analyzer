@@ -26,16 +26,6 @@ const softPenalties = {
     penalty: -0.15
   },
 
-  unclearSalary: {
-    phrases: [
-      'з.п. не указана',
-      'по договоренности',
-      'от 0 до',
-      'без указания зарплаты'
-    ],
-    penalty: -0.1
-  },
-
   soloResponsibility: {
     phrases: [
       'вся зона ответственности',
