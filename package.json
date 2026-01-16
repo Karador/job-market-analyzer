@@ -7,7 +7,11 @@
     "fetch": "NODE_ENV=production node src/index.js fetch",
     "fresh": "NODE_ENV=production node src/index.js fresh",
     "top": "NODE_ENV=production node src/index.js top",
-    "analyze": "NODE_ENV=production node src/index.js analyze"
+    "analyze": "NODE_ENV=production node src/index.js analyze",
+    "analyze market": "NODE_ENV=production node src/index.js analyze market",
+    "analyze meta": "NODE_ENV=production node src/index.js analyze meta",
+    "analyze brief": "NODE_ENV=production node src/index.js analyze brief",
+    "analyze full": "NODE_ENV=production node src/index.js analyze full"
   },
   "keywords": [],
   "author": "",

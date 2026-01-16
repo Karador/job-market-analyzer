@@ -117,11 +117,11 @@ function scoreMetaContext(vacancy) {
   const reviews = meta?.employerReviewsCount;
 
   if (rating >= 4.5) { delta += 0.08; signals.push('rating-4.5+'); }
-  else if (rating >= 4.0) { delta += 0.05; signals.push('rating-4+'); }
+  else if (rating >= 4.0) { delta += 0.04; signals.push('rating-4+'); }
   else if (rating > 0 && rating < 3.0) { delta -= 0.1; signals.push('rating-low'); }
 
   if (rating >= 4 && reviews >= 50) {
-    delta += 0.03;
+    delta += 0.02;
     signals.push('rating-trusted');
   }
 

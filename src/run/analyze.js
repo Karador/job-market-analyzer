@@ -4,20 +4,64 @@ const { penaltyStats } = require('../analysis/penaltyStats');
 const { marketProfile } = require('../analysis/marketProfile');
 const { skillGapFromTopKeywords } = require('../analysis/skillGapFromTopKeywords');
 const { marketRoleProfile } = require('../analysis/marketRoleProfile');
-const { vacancyMetaStats, metaSignalFrequency, metaSignalImpact, metaSignalsByRank } = require('../analysis/vacancyMetaStats');
+const {
+    vacancyMetaStats,
+    metaSignalFrequency,
+    metaSignalImpact,
+    metaSignalsByRank,
+    metaSignalCooccurrence,
+} = require('../analysis/vacancyMetaStats');
 
-async function runAnalyze() {
+const ANALYZE_PROFILES = {
+    brief: [
+        'scoreStats',
+        'penaltyStats'
+    ],
+    meta: [
+        'vacancyMetaStats',
+        'metaSignalFrequency',
+        'metaSignalImpact',
+        'metaSignalsByRank',
+        'metaSignalCooccurrence'
+    ],
+    market: [
+        'marketProfile',
+        'skillGapFromTopKeywords',
+        'marketRoleProfile'
+    ],
+    full: 'all'
+};
+
+const analyzers = {
+    scoreStats,
+    penaltyStats,
+    vacancyMetaStats,
+    metaSignalFrequency,
+    metaSignalImpact,
+    metaSignalsByRank,
+    marketProfile,
+    skillGapFromTopKeywords,
+    marketRoleProfile,
+    metaSignalCooccurrence
+};
+
+async function runAnalyze(profile = 'market') {
     const scoredVacancies = await loadVacancies();
 
-    console.log("stats: ", scoreStats(scoredVacancies));
-    console.log("penalties: ", penaltyStats(scoredVacancies));
-    console.log("meta: ", vacancyMetaStats(scoredVacancies));
-    console.log("metaSignalFrequency: ", metaSignalFrequency(scoredVacancies));
-    console.log("metaSignalImpact: ", metaSignalImpact(scoredVacancies));
-    console.log("metaSignalsByRank: ", metaSignalsByRank(scoredVacancies));
-    console.dir(marketProfile(scoredVacancies), { depth: null });
-    console.dir(skillGapFromTopKeywords(scoredVacancies), { depth: null });
-    console.dir(marketRoleProfile(scoredVacancies), { depth: null });
+    if (!ANALYZE_PROFILES[profile]) {
+        console.warn(`Unknown analyze profile: ${profile}, fallback to market`);
+        profile = 'market';
+    }
+
+    const list =
+        ANALYZE_PROFILES[profile] === 'all'
+            ? Object.keys(analyzers)
+            : ANALYZE_PROFILES[profile];
+
+    for (const name of list) {
+        console.log(`${name}:`);
+        console.dir(analyzers[name](scoredVacancies), { depth: null });
+    }
 }
 
 module.exports = { runAnalyze };

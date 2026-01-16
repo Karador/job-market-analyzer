@@ -76,4 +76,22 @@ function metaSignalsByRank(scored) {
   return result;
 }
 
-module.exports = { vacancyMetaStats, metaSignalFrequency, metaSignalImpact, metaSignalsByRank };
+function metaSignalCooccurrence(scored) {
+  let both = 0;
+  let onlyA = 0;
+  let onlyB = 0;
+
+  for (const v of scored) {
+    const s = v.scores.breakdown.metaContext?.signals || [];
+    const hasA = s.includes('rating-4+');
+    const hasB = s.includes('rating-trusted');
+
+    if (hasA && hasB) both++;
+    else if (hasA) onlyA++;
+    else if (hasB) onlyB++;
+  }
+
+  return { both, onlyA, onlyB };
+}
+
+module.exports = { vacancyMetaStats, metaSignalFrequency, metaSignalImpact, metaSignalsByRank, metaSignalCooccurrence };

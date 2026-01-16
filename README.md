@@ -139,9 +139,50 @@ Fetches recent vacancies and prints the top results.
 
 # Analyze stored data
 
-`npm run analyze`
+`npm run analyze [profile]`
 
 Generates aggregated statistics and keyword frequency reports based on cached data.
+
+## Profiles
+
+You can specify which profile to use for analysis:
+
+| Profile  | Description                                                                        |
+| -------- | ---------------------------------------------------------------------------------- |
+| `brief`  | Minimal analysis: core scores and penalties                                        |
+| `meta`   | Vacancy meta analysis: signals, company ratings, salary presence, React experience |
+| `market` | Market-oriented analysis: tech shares, skill gaps, role distributions              |
+| `full`   | Full analysis: includes all available statistics                                   |
+
+Default behavior:
+
+- Running `npm run analyze` without a profile now defaults to `market` profile.
+- This shows the most informative statistics after fetching vacancies.
+
+### Run default market-oriented analysis
+```bash
+npm run analyze
+```
+
+### Run meta signals analysis only
+```bash
+npm run analyze meta
+```
+
+### Run minimal analysis (scores + penalties)
+```bash
+npm run analyze brief
+```
+
+### Run full analysis with all metrics
+```bash
+npm run analyze full
+```
+
+Notes:
+
+- Even if you do not plan to tweak scoring weights, running meta profile is useful to monitor signals like company rating, number of reviews, and salary presence.
+- Some signals (e.g., rating-4+ vs trusted) can overlap — the tool tracks co-occurrence to avoid double-counting their impact.
 
 # Show top vacancies (default mode)
 
