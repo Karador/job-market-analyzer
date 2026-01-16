@@ -11,7 +11,7 @@ const TECH_RULES = {
 
   nodejs: {
     canonical: "nodejs",
-    match: ["node.js", "nodejs", "node"],
+    match: ["node.js", "nodejs", "node", "nest", "nestjs", "nest.js"],
   },
 
   react: {

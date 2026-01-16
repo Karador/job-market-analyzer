@@ -54,6 +54,6 @@ module.exports = { diffAnalysisLogs };
 
 if (require.main === module) {
   (async () => {
-    const res = await diffAnalysisLogs(`${paths.logs}/analysis_1768584355332.json`, `${paths.logs}/analysis_1768584355332.json`);
+    const res = await diffAnalysisLogs(`${paths.logs}/analysis_1768584355332.json`, `${paths.logs}/analysis_1768589317302.json`);
   })();
 }

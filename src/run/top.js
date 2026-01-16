@@ -19,10 +19,11 @@ async function runTop({ limit } = { limit: 5 }) {
 
     top.forEach(v => {
         console.log(
-            v.scores.total,
             v.vacancy.title,
             '\n',
             v.vacancy.meta.link,
+            v.explain,
+            '\n',
         );
     });
 }

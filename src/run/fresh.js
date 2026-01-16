@@ -72,10 +72,11 @@ async function runFresh({
 
   candidates.forEach(v => {
     console.log(
-      v.scores.total,
       v.vacancy.title,
       '\n',
       v.vacancy.meta.link,
+      v.explain,
+      '\n',
     );
   });
 }
