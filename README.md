@@ -1,14 +1,17 @@
 # job-market-analyzer
 
-A CLI-based tool for collecting, normalizing and analyzing job vacancies from multiple platforms.
+A CLI-based research tool for collecting, normalizing and analyzing real job market vacancies.
 
-The project focuses on reducing noise and cognitive load when browsing job listings by automatically filtering, scoring and aggregating vacancy data.
+Designed to reduce noise and cognitive load by filtering, scoring and aggregating vacancies using explainable heuristics.
 
 ---
 
 ## Purpose
 
-This tool was built as a **personal research and analysis utility**, not as a production service or job board.
+This tool was built as a **personal research and analysis utility**.
+
+It is not intended to be a production job board or commercial service,
+but focuses on correctness, explainability and architectural clarity.
 
 Its main goals are:
 - to analyze real job market data
@@ -29,6 +32,8 @@ The final review of vacancies is always done manually.
 - Produces explainable scoring results
 - Aggregates keyword and penalty statistics
 - Stores processed data locally for repeated analysis
+
+This allows comparing market signals over time instead of browsing listings manually.
 
 ---
 
@@ -227,4 +232,4 @@ If no mode is specified, the tool defaults to `top`.
 - This project was developed as a personal research tool
 - Heuristics and scoring rules are intentionally simple and explainable
 - The architecture evolved incrementally during development
-- The project prioritizes clarity and debuggability over completeness
+- The project prioritizes clarity, debuggability and signal quality over feature completeness.
