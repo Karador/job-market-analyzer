@@ -11,7 +11,11 @@
     "analyze market": "NODE_ENV=production node src/index.js analyze market",
     "analyze meta": "NODE_ENV=production node src/index.js analyze meta",
     "analyze brief": "NODE_ENV=production node src/index.js analyze brief",
-    "analyze full": "NODE_ENV=production node src/index.js analyze full"
+    "analyze full": "NODE_ENV=production node src/index.js analyze full",
+    "compare": "NODE_ENV=production node src/index.js compare",
+    "compare summary": "NODE_ENV=production node src/index.js compare summary",
+    "compare added": "NODE_ENV=production node src/index.js compare added",
+    "compare dropped": "NODE_ENV=production node src/index.js compare dropped"
   },
   "keywords": [],
   "author": "",

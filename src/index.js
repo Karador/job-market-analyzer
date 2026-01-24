@@ -2,6 +2,7 @@ const { runFetch } = require('./run/fetch');
 const { runTop } = require('./run/top');
 const { runAnalyze } = require('./run/analyze');
 const { runFresh } = require('./run/fresh');
+const { runCompare } = require('./run/compare');
 
 const mode = process.argv[2] ?? 'top';
 
@@ -15,6 +16,9 @@ const mode = process.argv[2] ?? 'top';
       break;
     case 'analyze':
       await runAnalyze();
+      break;
+    case 'compare':
+      await runCompare({ minScoreDiff: 0.02 });
       break;
     default:
       await runFresh({ pages: 1, limit: 5 });
