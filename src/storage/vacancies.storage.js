@@ -1,20 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
-const { vacancies } = require('../config/paths');
+const { vacancies, rescoredVacancies } = require('../config/paths');
 const { rankByQuantiles } = require('../score/ranker')
-
-/**
- * Вычисляет ранк вакансий относительно других по total score
- */
-function computeRanks(allVacancies) {
-  // сортируем по score
-  allVacancies.sort((a, b) => b.scores.total - a.scores.total);
-
-  // присваиваем rank от 1 (лучший) до N
-  allVacancies.forEach((v, index) => {
-    v.rank = index + 1;
-  });
-}
 
 /**
  * Сохраняет новые вакансии, считает ранк относительно существующих
@@ -50,15 +37,34 @@ async function saveVacancies(newVacancies) {
   return saved;
 }
 
-async function loadVacancies() {
+async function saveSnapshot(scoredVacancies) {
+  rankByQuantiles(scoredVacancies);
+
+  const stream = fs.createWriteStream(rescoredVacancies, { flags: 'w' });
+  const now = new Date().toISOString();
+  let saved = 0;
+
+  for (const v of scoredVacancies) {
+    stream.write(JSON.stringify({
+      ...v,
+      meta: { savedAt: now }
+    }) + '\n');
+    saved++;
+  }
+
+  stream.end();
+  return saved;
+}
+
+async function loadVacancies(path = vacancies) {
   const result = [];
 
-  if (!fs.existsSync(vacancies)) {
+  if (!fs.existsSync(path)) {
     return result;
   }
 
   const rl = readline.createInterface({
-    input: fs.createReadStream(vacancies),
+    input: fs.createReadStream(path),
     crlfDelay: Infinity,
   });
 
@@ -75,4 +81,4 @@ async function loadVacancies() {
   return result;
 }
 
-module.exports = { saveVacancies, loadVacancies };
+module.exports = { saveVacancies, saveSnapshot, loadVacancies };

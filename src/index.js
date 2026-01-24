@@ -4,7 +4,6 @@ const { runAnalyze } = require('./run/analyze');
 const { runFresh } = require('./run/fresh');
 
 const mode = process.argv[2] ?? 'top';
-const profile = process.argv[3] ?? 'market';
 
 (async () => {
   switch (mode) {
@@ -15,7 +14,7 @@ const profile = process.argv[3] ?? 'market';
       await runTop({ limit: 5 });
       break;
     case 'analyze':
-      await runAnalyze(profile);
+      await runAnalyze();
       break;
     default:
       await runFresh({ pages: 1, limit: 5 });

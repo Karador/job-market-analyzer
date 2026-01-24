@@ -48,8 +48,11 @@ const analyzers = {
     metaSignalCooccurrence
 };
 
-async function runAnalyze(profile = 'market') {
-    const scoredVacancies = await loadVacancies();
+const profile = process.argv[3] ?? 'market';
+const vacanciesPath = process.argv[4] === 'new' ? paths.rescoredVacancies : paths.vacancies;
+
+async function runAnalyze() {
+    const scoredVacancies = await loadVacancies(vacanciesPath);
 
     // Сбор лога
     const logData = collectAnalysisLog(scoredVacancies);

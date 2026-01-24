@@ -137,12 +137,17 @@ function scoreMetaContext(vacancy) {
     signals.push('react-1-3');
   }
 
+  // not remote likely
+  if (meta?.workSchedule === 'fullDay') {
+    delta -= 0.1;
+    signals.push('not-remote-likely');
+  }
+
   return {
     delta: Math.max(-0.2, Math.min(0.2, delta)),
     signals
   };
 }
-
 
 function scoreVacancy(vacancy) {
   const text = vacancy.text.toLowerCase();

@@ -8,5 +8,6 @@ module.exports = {
   logs: path.join(ROOT, 'logs'),
 
   vacancies: path.join(ROOT, 'data', 'vacancies.jsonl'),
+  rescoredVacancies: path.join(ROOT, 'data', 'rescoredVacancies.jsonl'),
   seen: path.join(ROOT, 'data', 'seen.json'),
 };

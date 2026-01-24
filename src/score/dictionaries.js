@@ -1,17 +1,13 @@
 const entrySignals = {
   positive: {
-    'без опыта': 2,
-    'начинающий': 1.5,
-    'junior': 1.5,
-    'intern': 1.5,
-    'стажировка': 1.2,
-    'обучение': 1
+    'junior': 0.6,
+    'intern': 0.5,
+    'стажировка': 0.4
   },
   negative: {
-    '3+': -2,
     'senior': -3,
     'lead': -3,
-    'highload': -1.5
+    '5+': -2.5
   }
 };
 
@@ -22,8 +18,8 @@ const softPenalties = {
   },
 
   experienceStretch: {
-    phrases: ['middle', 'middle+', '3+'],
-    penalty: -0.15
+    phrases: ['middle', '3+'],
+    penalty: -0.1
   },
 
   soloResponsibility: {
